@@ -107,6 +107,32 @@ b = ''.join(str_array)
 
 #### Leetcode with Array:
 
+##### GRIND 75 selection: 
+##### 121. Best Time to Buy and Sell Stock
+
+Description: 
+
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+
+
+Solution: 
+```python
+def maxProfit(self, prices: List[int]) -> int:
+    min_price, max_profit = prices[0], float('-inf')
+    
+    for i in range(len(prices)):
+        min_price = min(prices[i], min_price)
+        max_profit = max(max_profit, prices[i] - min_price)
+
+
+    return max_profit
+```
+
+
+
 ##### 238. Move Zeroes
 
 Description:
