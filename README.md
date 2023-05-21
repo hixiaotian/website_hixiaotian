@@ -1,1 +1,1 @@
-# website_hixiaotian
+# 这个leetcode note 对应网站 [hixiaotian.com](http://hixiaotian.com/)
