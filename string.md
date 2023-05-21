@@ -375,4 +375,4 @@ def countBinarySubstrings(self, s: str) -> int:
             count += 1
     return count
 ```
-![rGdjF0f](http://hixiaotian.com/content/images/2021/09/rGdjF0f.png)
+![rGdjF0f](https://hi-elliot.com/content/images/2021/09/rGdjF0f.png)
