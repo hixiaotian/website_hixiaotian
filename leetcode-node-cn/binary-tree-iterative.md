@@ -85,6 +85,11 @@ class Solution:
         return res
 ```
 
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
+
 #### [144. Binary Tree Preorder Traversal](https://leetcode.com/problems/binary-tree-preorder-traversal/)
 
 test cases:
@@ -140,6 +145,11 @@ class Solution:
             root = root.right
         return res
 ```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
 
 #### [145. Binary Tree Postorder Traversal](https://leetcode.com/problems/binary-tree-postorder-traversal/)
 
@@ -198,6 +208,11 @@ class Solution:
         return res[::-1]
 ```
 
+复杂度分析
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
+
 ### 高级类型题
 
 #### [173. Binary Search Tree Iterator](https://leetcode.com/problems/binary-search-tree-iterator/)
@@ -239,6 +254,11 @@ class BSTIterator:
         return nxt.val
 ```
 
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
+
 我们再来一道可以使用iterative 来做的题目：
 
 #### [98. Validate Binary Search Tree](https://leetcode.com/problems/validate-binary-search-tree/)
@@ -275,3 +295,46 @@ class Solution:
             root = root.right
         return True
 ```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
+
+#### [230. Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+
+test cases:
+![image.png](https://assets.leetcode.com/uploads/2021/01/28/kthtree1.jpg)
+
+```text
+Input: root = [3,1,4,null,2], k = 1
+Output: 1
+```
+
+这道题目，我们可以使用iterative的方法来做，我们可以使用stack来做，具体操作就是：
+
+- 首先我们需要一个stack，然后我们把root放入stack中
+- 然后我们一直把root.left放入stack中，直到root.left为空
+- 然后我们pop出stack中的元素，然后把root.right放入stack中，然后重复上面的操作
+- 然后我们需要一个count，来记录当前是第几个元素，然后我们每次pop出stack中的元素的时候，我们都需要判断一下，当前的count是否等于k，如果等于，那么我们就返回当前的值，如果不等于，那么我们就继续往下走
+
+```python
+class Solution:
+    def kthSmallest(self, root: TreeNode, k: int) -> int:
+        stack = []
+        count = 0
+        while root or stack:
+            while root:
+                stack.append(root)
+                root = root.left
+            root = stack.pop()
+            count += 1
+            if count == k:
+                return root.val
+            root = root.right
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个节点都会被遍历一次
+- 空间复杂度：O(n)，因为stack的大小最大为n
