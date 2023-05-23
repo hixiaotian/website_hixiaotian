@@ -10,6 +10,8 @@ recursive的做法，看似代码简洁，实则要考虑的方面有很多。�
 
 ### 基础题目
 
+<b>↓点击题目就可以直接跳转到leetcode题目页面↓</b>
+
 #### [104. Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
 
 test cases:

@@ -7,6 +7,8 @@
 
 接下来以在一个有序数组中搜寻一个target为例题，比较这仨者的区别。
 
+<b>↓点击题目就可以直接跳转到leetcode题目页面↓</b>
+
 #### [704. Binary Search](https://leetcode.com/problems/binary-search/)
 
 test cases:
