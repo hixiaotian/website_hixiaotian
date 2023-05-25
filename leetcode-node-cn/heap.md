@@ -73,7 +73,7 @@ class Solution:
                 heapq.heappush(heap, num)
             else:
                 if num > heap[0]:
-                    heapq.heapreplace(heap, num)
+                    heapq.heappushpop(heap, num)
                     # 这里也可以使用 heapq.heappushpop(heap, num)，区别是 heapreplace 会先弹出最小的元素，然后再插入 num，而 heappushpop 会直接返回 num，不会插入 num。
         return heap[0]
 ```
@@ -84,6 +84,18 @@ class Solution:
 class Solution:
     def findKthLargest(self, nums: List[int], k: int) -> int:
         return heapq.nlargest(k, nums)[-1]
+```
+
+也可以反向思维，使用最大堆来解决这道题。
+
+```python
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        heap = [-num for num in nums]
+        heapq.heapify(heap)
+        for _ in range(k):
+            res = heapq.heappop(heap)
+        return -res
 ```
 
 复杂度分析：
@@ -116,11 +128,11 @@ class Solution:
     def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
         heap = []
         for i in range(len(matrix)):
-            heapq.heappush(heap, (matrix[i][0], i, 0))
+            heapq.heappush(heap, (matrix[i][0], i, 0)) # 先把每个矩阵的第一个元素放入 heap, 同时记录这个元素所在矩阵的坐标
         res = 0
-        for _ in range(k):
-            res, i, j = heapq.heappop(heap)
-            if j + 1 < len(matrix[0]):
+        for _ in range(k): # 然后从 heap 中取出最小的元素，然后把这个元素所在矩阵的下一个元素放入 heap
+            res, i, j = heapq.heappop(heap) # 这里的 i 和 j 是矩阵的坐标
+            if j + 1 < len(matrix[0]): # 如果 j + 1 < len(matrix[0])，说明这个元素不是所在矩阵的最后一个元素，我们可以把这个元素所在矩阵的下一个元素放入 heap
                 heapq.heappush(heap, (matrix[i][j + 1], i, j + 1))
         return res
 ```
@@ -156,8 +168,32 @@ class Solution:
                 heapq.heappush(heap, (freq, num))
             else:
                 if freq > heap[0][0]:
-                    heapq.heapreplace(heap, (freq, num))
+                    heapq.heappushpop(heap, (freq, num))
         return [num for freq, num in heap]
+```
+
+也可以使用 heapq.nlargest 来解决这道题。
+
+```python
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        count = collections.Counter(nums)
+        return heapq.nlargest(k, count.keys(), key=count.get)
+```
+
+当然也可以使用最大堆来解决这道题。
+
+```python
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        heap = []
+        count = collections.Counter(nums)
+        for num, freq in count.items():
+            heapq.heappush(heap, (-freq, num))
+        res = []
+        for _ in range(k):
+            res.append(heapq.heappop(heap)[1])
+        return res
 ```
 
 复杂度分析：
@@ -181,18 +217,19 @@ Output: ["the", "is", "sunny", "day"]
 
 这道题的思路是，我们可以使用一个大小为 k 的 heap，然后遍历数组，把每个元素放入 hash table，然后把 hash table 中的元素放入 heap，然后每次从 heap 中取出最小的元素，然后把这个元素所在 hash table 的下一个元素放入 heap。
 
+！！注意这道题要求返回的是字母顺序最小的 k 个元素而且是需要从大到小排序的。所以我们只能使用最大堆来解决这道题。
+
 ```python
 class Solution:
     def topKFrequent(self, words: List[str], k: int) -> List[str]:
         heap = []
         count = collections.Counter(words)
         for word, freq in count.items():
-            if len(heap) < k:
-                heapq.heappush(heap, (-freq, word))
-            else:
-                if (-freq, word) > heap[0]:
-                    heapq.heapreplace(heap, (-freq, word))
-        return [word for freq, word in heap]
+            heapq.heappush(heap, (-freq, word))
+        res = []
+        for _ in range(k):
+            res.append(heapq.heappop(heap)[1])
+        return res
 ```
 
 复杂度分析：
@@ -214,20 +251,20 @@ Input: [[7,10],[2,4]]
 Output: 1
 ```
 
-这道题的思路是，我们可以使用一个大小为 k 的 heap，然后遍历数组，把每个元素放入 heap，然后每次从 heap 中取出最小的元素，然后把这个元素所在 hash table 的下一个元素放入 heap。
+这道题的思路是，我们把 interval 按照开始时间排序，然后使用一个 heap 来存储结束时间，然后遍历数组，如果当前的开始时间大于 heap 的最小值，那么就把 heap 的最小值 pop 出来，然后把当前的结束时间放入 heap。能这么做的原因是，如果当前的开始时间大于 heap 的最小值，那么说明这个会议可以使用之前的会议室，所以我们把之前的会议室的结束时间 pop 出来，然后把当前的结束时间放入 heap。这是一种变向的贪心算法。
 
 ```python
 class Solution:
     def minMeetingRooms(self, intervals: List[List[int]]) -> int:
         if not intervals:
             return 0
-        intervals.sort(key=lambda x: x[0])
+        intervals.sort()
         heap = []
-        heapq.heappush(heap, intervals[0][1])
+        heapq.heappush(heap, intervals[0][1]) # 把第一个会议的结束时间放入 heap
         for i in range(1, len(intervals)):
-            if intervals[i][0] >= heap[0]:
-                heapq.heappop(heap)
-            heapq.heappush(heap, intervals[i][1])
+            if intervals[i][0] >= heap[0]: # 如果当前的开始时间大于 heap 的最小值，那么就把 heap 的最小值 pop 出来，然后把当前的结束时间放入 heap
+                heapq.heappop(heap) # 仔细想一下，其实就相当于抵消了一个会议室
+            heapq.heappush(heap, intervals[i][1]) # 把当前的结束时间放入 heap
         return len(heap)
 ```
 
@@ -235,48 +272,6 @@ class Solution:
 
 - 时间复杂度：O(nlogn)，原因是我们需要遍历整个数组，然后每次插入都需要 logn 的时间复杂度。
 - 空间复杂度：O(n)，原因是我们需要使用 heap 来存储数字。
-
-#### [23. Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
-
-这道题的描述是合并 k 个有序链表。
-
-test cases:
-
-```text
-Input:
-[
-  1->4->5,
-  1->3->4,
-  2->6
-]
-Output: 1->1->2->3->4->4->5->6
-```
-
-这道题的思路是，我们可以使用一个大小为 k 的 heap，然后遍历链表，把每个链表的第一个元素放入 heap，然后每次从 heap 中取出最小的元素，然后把这个元素所在链表的下一个元素放入 heap。
-
-```python
-class Solution:
-    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
-        heap = []
-        for i, node in enumerate(lists):
-            if node:
-                heapq.heappush(heap, (node.val, i))
-        dummy = ListNode(0)
-        curr = dummy
-        while heap:
-            val, i = heapq.heappop(heap)
-            curr.next = lists[i]
-            curr = curr.next
-            lists[i] = lists[i].next
-            if lists[i]:
-                heapq.heappush(heap, (lists[i].val, i))
-        return dummy.next
-```
-
-复杂度分析：
-
-- 时间复杂度：O(nlogk)，原因是我们需要遍历整个链表，然后每次插入都需要 logk 的时间复杂度。
-- 空间复杂度：O(k)，原因是我们需要使用 heap 来存储数字。
 
 #### [373. Find K Pairs with Smallest Sums](https://leetcode.com/problems/find-k-pairs-with-smallest-sums/)
 
@@ -341,6 +336,48 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(klogk)，原因是我们需要遍历整个数组，然后每次插入都需要 logk 的时间复杂度。
+- 空间复杂度：O(k)，原因是我们需要使用 heap 来存储数字。
+
+#### [23. Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
+
+这道题的描述是合并 k 个有序链表。
+
+test cases:
+
+```text
+Input:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+Output: 1->1->2->3->4->4->5->6
+```
+
+这道题的思路是，我们可以使用一个大小为 k 的 heap，然后遍历链表，把每个链表的第一个元素放入 heap，然后每次从 heap 中取出最小的元素，然后把这个元素所在链表的下一个元素放入 heap。
+
+```python
+class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        heap = []
+        for i, node in enumerate(lists):
+            if node:
+                heapq.heappush(heap, (node.val, i))
+        dummy = ListNode(0)
+        curr = dummy
+        while heap:
+            val, i = heapq.heappop(heap)
+            curr.next = lists[i]
+            curr = curr.next
+            lists[i] = lists[i].next
+            if lists[i]:
+                heapq.heappush(heap, (lists[i].val, i))
+        return dummy.next
+```
+
+复杂度分析：
+
+- 时间复杂度：O(nlogk)，原因是我们需要遍历整个链表，然后每次插入都需要 logk 的时间复杂度。
 - 空间复杂度：O(k)，原因是我们需要使用 heap 来存储数字。
 
 #### [407. Trapping Rain Water II](https://leetcode.com/problems/trapping-rain-water-ii/)
