@@ -91,6 +91,8 @@ class Solution:
 
 #### [39. Combination Sum](https://leetcode.com/problems/combination-sum/)
 
+这道题的描述是给定一个无重复元素的数组 candidates 和一个目标数 target，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的数字可以无限制重复被选取。
+
 test cases:
 
 ```text
@@ -100,8 +102,6 @@ Output: [[2,2,3],[7]]
 Input: candidates = [2,3,5], target = 8
 Output: [[2,2,2,2],[2,3,3],[3,5]]
 ```
-
-这道题的描述是给定一个无重复元素的数组 candidates 和一个目标数 target，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的数字可以无限制重复被选取。
 
 这道题的思路也是回溯算法的思路，我们可以把每一个数字都看成是一个树，比如 candidates = [2,3,6,7]，target = 7 的时候，我们可以看成是这样的一棵树：
 
@@ -120,17 +120,17 @@ class Solution:
     def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
         res = []
 
-        def backtrack(index, path, target):
-            if target == 0: # 如果目标数为 0，说明已经遍历完了
+        def backtrack(index, path, rest):
+            if rest == 0: # 如果目标数为 0，说明已经遍历完了
                 res.append(path[:])
                 return
 
-            for i in range(index, len(candidates)):
-                if candidates[i] > target: # 如果当前的数大于目标数，说明不符合条件，直接返回
-                    continue
+            if rest < 0: # 如果目标数小于 0，说明不是正确的结果
+                return
 
+            for i in range(index, len(candidates)):
                 path.append(candidates[i]) # 做出选择
-                backtrack(i, path, target - candidates[i]) # 进入下一层决策树
+                backtrack(i, path, rest - candidates[i]) # 进入下一层决策树
                 path.pop() # 撤销选择
 
         backtrack(0, [], target)
@@ -144,6 +144,8 @@ class Solution:
 
 #### [40. Combination Sum II](https://leetcode.com/problems/combination-sum-ii/)
 
+这道题的描述是给定一个数组 candidates 和一个目标数 target，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的每个数字在每个组合中只能使用一次。
+
 test cases:
 
 ```text
@@ -154,8 +156,6 @@ Input: candidates = [2,5,2,1,2], target = 5
 Output: [[1,2,2],[5]]
 ```
 
-这道题的描述是给定一个数组 candidates 和一个目标数 target，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的每个数字在每个组合中只能使用一次。
-
 这道题和上一道题的区别在于，上一道题中的数组中的数字可以无限制重复被选取，而这道题中的数组中的数字在每个组合中只能使用一次。那么我们就可以对这道题进行一些修改，比如在递归的时候，我们可以把索引加一，这样就可以保证每个数字只会被使用一次。
 
 ```python
@@ -163,20 +163,24 @@ class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         res = []
 
-        def backtrack(index, path, target):
-            if target == 0: # 如果目标数为 0，说明已经遍历完了
+        def backtrack(start, path, rest):
+            if rest == 0: # 如果目标数为 0，说明已经遍历完了
                 res.append(path[:])
                 return
 
-            for i in range(index, len(candidates)):
-                if candidates[i] > target: # 如果当前的数大于目标数，说明不符合条件，直接返回
-                    continue
+            if rest < 0: # 如果目标数小于 0，说明不是正确的结果
+                return
 
-                if i > index and candidates[i] == candidates[i - 1]: # 如果当前的数和前一个数相等，说明已经遍历过了，直接返回
+            for i in range(start, len(candidates)):
+                if i > start and candidates[i] == candidates[i - 1]:
+                    # 如果当前的数和前一个数相等，说明已经遍历过了，直接返回
+                    # 举个例子，比如 candidates = [1,1,2,5,6,7,10]，target = 8
+                    # 当 i = 1 的时候，path = [1]，rest = 7，此时 i > start 并且 candidates[i] == candidates[i - 1]
+                    # 所以直接跳过，不进行递归
                     continue
 
                 path.append(candidates[i]) # 做出选择
-                backtrack(i + 1, path, target - candidates[i]) # 进入下一层决策树
+                backtrack(i + 1, path, rest - candidates[i]) # 进入下一层决策树
                 path.pop() # 撤销选择
 
         candidates.sort() # 先对数组进行排序
@@ -190,6 +194,8 @@ class Solution:
 - 空间复杂度：O(target)。除了答案数组之外，空间复杂度取决于递归的栈深度，在最坏的情况下，需要递归 O(target) 层。
 
 #### [216. Combination Sum III](https://leetcode.com/problems/combination-sum-iii/)
+
+这道题的描述是给定一个整数 k 和一个整数 n，找出所有相加之和为 n 的 k 个数的组合。组合中只允许含有 1 - 9 的正整数，并且每种组合中不存在重复的数字。
 
 test cases:
 
@@ -210,8 +216,6 @@ Input: k = 9, n = 45
 Output: [[1,2,3,4,5,6,7,8,9]]
 ```
 
-这道题的描述是给定一个整数 k 和一个整数 n，找出所有相加之和为 n 的 k 个数的组合。组合中只允许含有 1 - 9 的正整数，并且每种组合中不存在重复的数字。
-
 这道题和上一道题的区别在于，上一道题中的数组中的数字可以无限制重复被选取，而这道题中的数组中的数字在每个组合中只能使用一次。那么我们就可以对这道题进行一些修改，比如在递归的时候，我们可以把索引加一，这样就可以保证每个数字只会被使用一次。
 
 ```python
@@ -219,20 +223,17 @@ class Solution:
     def combinationSum3(self, k: int, n: int) -> List[List[int]]:
         res = []
 
-        def backtrack(index, path, target):
-            if target == 0 and len(path) == k: # 如果目标数为 0，且路径的长度和 k 相等，说明已经遍历完了
+        def backtrack(start, path, rest):
+            if rest == 0 and len(path) == k: # 如果目标数为 0，且路径的长度和 k 相等，说明已经遍历完了
                 res.append(path[:])
                 return
 
-            for i in range(index, 10):
-                if i > index and i == i - 1: # 如果当前的数字和前一个数字相等，说明已经遍历过了，直接返回
-                    continue
+            if rest < 0 or len(path) >= k: # 如果目标数小于 0，或者路径的长度大于 k，说明不是正确的结果
+                return
 
-                if i > target: # 如果当前的数字大于目标数，说明不符合条件，直接返回
-                    continue
-
+            for i in range(start, 10):
                 path.append(i) # 做出选择
-                backtrack(i + 1, path, target - i) # 进入下一层决策树
+                backtrack(i + 1, path, rest - i) # 进入下一层决策树
                 path.pop() # 撤销选择
 
         backtrack(1, [], n)
@@ -246,6 +247,8 @@ class Solution:
 
 #### [46. Permutations](https://leetcode.com/problems/permutations/)
 
+这道题的描述是给定一个不含重复数字的数组 nums，返回这些数字的所有可能的全排列。你可以按任意顺序返回答案。
+
 test cases:
 
 ```text
@@ -258,8 +261,6 @@ Output: [[0,1],[1,0]]
 Input: nums = [1]
 Output: [[1]]
 ```
-
-这道题的描述是给定一个不含重复数字的数组 nums，返回这些数字的所有可能的全排列。你可以按任意顺序返回答案。
 
 这道题的思路也是回溯算法的思路，我们可以把每一个数字都看成是一个树，比如 nums = [1,2,3] 的时候，我们可以看成是这样的一棵树：
 
@@ -295,6 +296,14 @@ class Solution:
         return res
 ```
 
+实际上这道题也可以使用 python 的包来解决，比如 itertools 中的 permutations 函数，这个函数可以返回一个数组的所有的组合，比如：
+
+```python
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        return list(itertools.permutations(nums))
+```
+
 复杂度分析：
 
 - 时间复杂度：O(N \* N!)，其中 N 为数组的长度。
@@ -312,28 +321,62 @@ Input: nums = [1,2,3]
 Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
 ```
 
-这道题和上一道题的区别在于，上一道题中的数组中的数字可以无限制重复被选取，而这道题中的数组中的数字在每个组合中只能使用一次。那么我们就可以对这道题进行一些修改，比如在递归的时候，我们可以把索引加一，这样就可以保证每个数字只会被使用一次。
+这道题和上一道题的区别在于，这道题中的数组中的数字可以重复出现。那么我们就可以使用 counter 来记录每个数字出现的次数，然后在回溯的前后，加减相应的次数即可。
 
 ```python
 class Solution:
     def permuteUnique(self, nums: List[int]) -> List[List[int]]:
-        res = []
-
-        def backtrack(path):
-            if len(path) == len(nums): # 如果路径的长度和数组的长度相等，说明已经遍历完了
-                res.append(path[:])
+        results = []
+        def backtrack(path, counter):
+            if len(path) == len(nums):
+                # 当路径的长度和数组的长度相等的时候，说明已经遍历完了
+                results.append(path[:])
                 return
 
-            for i in range(len(nums)):
-                if nums[i] in path: # 如果当前的数字已经在路径中了，说明已经遍历过了，直接返回
-                    continue
+            for num in counter:
+                if counter[num] > 0: # 如果当前数字的次数大于 0，说明可以使用
+                    path.append(num)
+                    counter[num] -= 1 # 次数减一
+                    backtrack(path, counter)
+                    path.pop() # 撤销选择
+                    counter[num] += 1 # 次数加一
 
-                path.append(nums[i]) # 做出选择
-                backtrack(path) # 进入下一层决策树
-                path.pop() # 撤销选择
+        backtrack([], Counter(nums))
+        return results
+```
 
-        backtrack([])
+或者我们可以使用 visited 数组来记录每个数字是否被访问过，这样就不需要使用 counter 了。
+
+```python
+def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+
+    def backtrack(res, cur, nums, visited):
+        if len(cur) == len(nums):
+            res.append(cur[:])
+
+        for i in range(len(nums)):
+            if (visited[i] == 1) or (i > 0 and nums[i] == nums[i - 1] and visited[i - 1] == 0):
+                continue
+
+            visited[i] = 1
+            cur.append(nums[i])
+            backtrack(res, cur, nums, visited)
+            visited[i] = 0
+            cur.pop()
         return res
+
+    res = []
+    boolean = [0 for _ in range(len(nums))]
+    nums.sort()
+    return backtrack(res, [], nums, boolean)
+```
+
+实际上这道题也可以使用 python 的包来解决，比如 itertools 中的 permutations 函数，这个函数可以返回一个数组的所有的组合，比如：
+
+```python
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        return list(set(itertools.permutations(nums)))
 ```
 
 复杂度分析：
@@ -355,7 +398,7 @@ Output: [[],[0]]
 
 这道题的描述是给定一个不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。解集不能包含重复的子集。
 
-这道题的思路也是回溯算法的思路，我们可以把每一个数字都看成是一个树，比如 nums = [1,2,3] 的时候，我们可以看成是这样的一棵树：
+这道题的思路也是回溯算法的思路，我们可以把每一个数字都看成是一个树，比如 nums = [1,2,3] 的时候，我们可以看子集树是这样的一棵树：
 
 ```text
                 []
@@ -364,8 +407,10 @@ Output: [[],[0]]
       /  \     /  \     /  \
     2     3   3    1   1    2
    / \   / \ / \  / \ / \  / \
-  3   1 2   2 1  1 3 2   3 3   1
+  3   1 1   2  2 1  3 3  2 2  1
 ```
+
+实际上这是错的，因为这棵树中有重复的子集，比如 [1,2] 和 [2,1]，所以我们需要对这棵树进行剪枝，剪枝的方法就是在递归的时候，传入一个 start 的参数，这个参数表示当前数字的下标，比如我们在遍历到 2 的时候，start 就是 1，那么我们就只需要遍历 2 之后的数字，这样就不会出现重复的子集了。
 
 那么我们就可以对这棵树进行回溯，得到所有的结果。
 
@@ -374,16 +419,24 @@ class Solution:
     def subsets(self, nums: List[int]) -> List[List[int]]:
         res = []
 
-        def backtrack(index, path):
+        def backtrack(start, path):
             res.append(path[:])
 
-            for i in range(index, len(nums)):
+            for i in range(start, len(nums)):
                 path.append(nums[i]) # 做出选择
                 backtrack(i + 1, path) # 进入下一层决策树
                 path.pop() # 撤销选择
 
         backtrack(0, [])
         return res
+```
+
+实际上这道题也可以使用 python 的包来解决，比如 itertools 中的 combinations 函数，这个函数可以返回一个数组的所有的组合，比如：
+
+```python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        return chain.from_iterable(chain([combinations(nums, i) for i in range(len(nums) + 1)]))
 ```
 
 复杂度分析：
@@ -403,18 +456,18 @@ Input: nums = [0]
 Output: [[],[0]]
 ```
 
-这道题和上一道题的区别在于，上一道题中的数组中的数字可以无限制重复被选取，而这道题中的数组中的数字在每个组合中只能使用一次。那么我们就可以对这道题进行一些修改，比如在递归的时候，我们可以把索引加一，这样就可以保证每个数字只会被使用一次。
+这道题和上一道题的区别在于，这道题的数组中包含重复的元素，所以我们需要对这棵树进行剪枝，剪枝的方法就是在递归的时候，传入一个 start 的参数，这个参数表示当前数字的下标，比如我们在遍历到 2 的时候，start 就是 1，那么我们就只需要遍历 2 之后的数字，这样就不会出现重复的子集了。而且要注意的是，我们在遍历的时候，如果当前的数字和前一个数字相等，说明已经遍历过了，直接返回。
 
 ```python
 class Solution:
     def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
         res = []
 
-        def backtrack(index, path):
+        def backtrack(start, path):
             res.append(path[:])
 
-            for i in range(index, len(nums)):
-                if i > index and nums[i] == nums[i - 1]: # 如果当前的数字和前一个数字相等，说明已经遍历过了，直接返回
+            for i in range(start, len(nums)):
+                if i > start and nums[i] == nums[i - 1]: # 如果当前的数字和前一个数字相等，说明已经遍历过了，直接返回
                     continue
 
                 path.append(nums[i]) # 做出选择
@@ -424,6 +477,14 @@ class Solution:
         nums.sort() # 先对数组进行排序
         backtrack(0, [])
         return res
+```
+
+实际上这道题也可以使用 python 的包来解决，比如 itertools 中的 combinations 函数，这个函数可以返回一个数组的所有的组合，比如：
+
+```python
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        return set([tuple(sorted(item)) for item in chain.from_iterable(chain([combinations(nums, i) for i in range(len(nums) + 1)]))])
 ```
 
 复杂度分析：
@@ -449,13 +510,7 @@ Output: ["()"]
 
 这道题的思路也是回溯算法的思路，我们可以把每一个括号都看成是一个树，比如 n=3 的时候，我们可以看成是这样的一棵树：
 
-```text
-                (
-        /       |       \
-       ((       ()       ()
-      /  \     /  \     /  \
-    (((  (()  ()(  ()  ()()
-```
+![image](https://leetcode.com/problems/generate-parentheses/Figures/22/5.png)
 
 那么我们就可以对这棵树进行回溯，得到所有的结果。
 
@@ -556,19 +611,13 @@ test cases:
 
 ```text
 Input: s = "25525511135"
-Output: ["
+Output: ["255.255.11.135","255.255.111.35"]
 
 Input: s = "0000"
-Output: ["
-
-Input: s = "1111"
-Output: ["
-
-Input: s = "010010"
-Output: ["
+Output: ["0.0.0.0"]
 
 Input: s = "101023"
-Output: ["
+Output: ["1.0.10.23","1.0.102.3","10.1.0.23","10.10.2.3","101.0.2.3"]
 ```
 
 这道题的描述是给定一个只包含数字的字符串 s，返回所有可能从 s 获得的有效 IP 地址。你可以按任何顺序返回答案。
@@ -592,19 +641,19 @@ class Solution:
     def restoreIpAddresses(self, s: str) -> List[str]:
         res = []
 
-        def backtrack(index, path):
-            if index == len(s) and len(path) == 4: # 如果索引和字符串的长度相等，说明已经遍历完了
+        def backtrack(start, path):
+            if start == len(s) and len(path) == 4: # 如果索引和字符串的长度相等，说明已经遍历完了
                 res.append(".".join(path))
                 return
 
-            for i in range(index, len(s)):
-                if len(path) > 4: # 如果路径的长度大于 4，说明不符合条件，直接返回
+            if len(path) > 4: # 如果路径的长度大于 4，说明不符合条件，直接返回
+                return
+
+            for i in range(start, len(s)):
+                if s[start] == "0" and i > start: # 如果当前的数字是 0，且索引不相等，说明是连续的 0，不符合条件，直接返回
                     return
 
-                if s[index] == "0" and i > index: # 如果当前的数字是 0，且索引不相等，说明不符合条件，直接返回
-                    return
-
-                num = int(s[index:i + 1]) # 把当前的数字转换成整数
+                num =  int(s[start:i + 1])
 
                 if num > 255: # 如果当前的数字大于 255，说明不符合条件，直接返回
                     return
