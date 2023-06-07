@@ -1,8 +1,8 @@
 ### 前言
 
-在这个专题，我们主要讨论矩阵和二叉树这两种大类的bfs做法。
+在这个专题，我们主要讨论矩阵和二叉树这两种大类的 bfs 做法。
 
-BFS 有一个很经典的模板讨论，在python代码中，我们可以简单的使用queue写出他的模板公式：
+BFS 有一个很经典的模板讨论，在 python 代码中，我们可以简单的使用 queue 写出他的模板公式：
 
 ```python
 def bfs():
@@ -15,15 +15,15 @@ def bfs():
             q.append(邻居)
 ```
 
-要注意，二叉树的题目中，不需要担心bfs的visited 情况，而在矩阵中，我们需要考虑visited的情况，否则会造成死循环。
+要注意，二叉树的题目中，不需要担心 bfs 的 visited 情况，而在矩阵中，我们需要考虑 visited 的情况，否则会造成死循环。
 
-接下来，我们从最简单的二叉树的bfs开始讨论。
+接下来，我们从最简单的二叉树的 bfs 开始讨论。
 
-### 二叉树的BFS
+### 二叉树的 BFS
 
-#### 二叉树的BFS模板
+#### 二叉树的 BFS 模板
 
-二叉树的BFS模板，我们可以使用queue来实现，具体的代码如下：
+二叉树的 BFS 模板，我们可以使用 queue 来实现，具体的代码如下：
 
 ```python
 def bfs(root):
@@ -53,27 +53,34 @@ Output: true
 Explanation: The root-to-leaf path with the target sum is shown.
 ```
 
-这道题目的意思是，给定一个二叉树，判断是否存在一条从root到leaf的路径，使得路径上的所有节点的和等于targetSum。
+这道题目的意思是，给定一个二叉树，判断是否存在一条从 root 到 leaf 的路径，使得路径上的所有节点的和等于 targetSum。
 
-思路就是使用bfs来遍历所有的路径，然后判断是否有路径的和等于sum，我们来使用上面的模板来解决这道题目。
+思路就是使用 bfs 来遍历所有的路径，然后判断是否有路径的和等于 sum，我们来使用上面的模板来解决这道题目。
 
 ```python
 class Solution:
-    def hasPathSum(self, root: TreeNode, sum: int) -> bool:
+    def hasPathSum(self, root: Optional[TreeNode], targetSum: int) -> bool:
         if not root:
             return False
-        q = collections.deque()
-        q.append(root)
+
+        q = collections.deque([(root, root.val)])
+
         while q:
-            cur = q.popleft()
-            if not cur.left and not cur.right and cur.val == sum:
-                return True
-            if cur.left:
-                cur.left.val += cur.val
-                q.append(cur.left)
-            if cur.right:
-                cur.right.val += cur.val
-                q.append(cur.right)
+            cur, path_sum = q.popleft()
+            if not cur.left and not cur.right:
+                if targetSum == path_sum:
+                    return True
+
+            elif cur.left and not cur.right:
+                q.append((cur.left, path_sum + cur.left.val))
+
+            elif not cur.left and cur.right:
+                q.append((cur.right, path_sum + cur.right.val))
+
+            else:
+                q.append((cur.left, path_sum + cur.left.val))
+                q.append((cur.right, path_sum + cur.right.val))
+
         return False
 ```
 
@@ -92,9 +99,9 @@ Input: root = [3,9,20,null,null,15,7]
 Output: 2
 ```
 
-这道题目的意思是，给定一个二叉树，求出从root到leaf的最小深度。
+这道题目的意思是，给定一个二叉树，求出从 root 到 leaf 的最小深度。
 
-思路就是使用bfs来遍历所有的路径，然后判断是否有路径的和等于sum，我们来使用上面的模板来解决这道题目。
+思路就是使用 bfs 来遍历所有的路径，然后判断是否有路径的和等于 sum，我们来使用上面的模板来解决这道题目。
 
 ```python
 class Solution:
@@ -133,9 +140,9 @@ Input: root = [3,9,20,null,null,15,7]
 Output: 3
 ```
 
-这道题目的意思是，给定一个二叉树，求出从root到leaf的最大深度。
+这道题目的意思是，给定一个二叉树，求出从 root 到 leaf 的最大深度。
 
-思路就是使用bfs来遍历所有的路径，然后判断是否有路径的和等于sum，我们来使用上面的模板来解决这道题目。
+思路就是使用 bfs 来遍历所有的路径，然后判断是否有路径的和等于 sum，我们来使用上面的模板来解决这道题目。
 
 ```python
 class Solution:
@@ -177,9 +184,9 @@ The root-to-leaf path 4->0 represents the number 40.
 Therefore, sum = 495 + 491 + 40 = 1026.
 ```
 
-这道题目的意思是，给定一个二叉树，求出从root到leaf的所有路径的和。
+这道题目的意思是，给定一个二叉树，求出从 root 到 leaf 的所有路径的和。
 
-思路就是使用bfs来遍历所有的路径，然后判断是否有路径的和等于sum，我们来使用上面的模板来解决这道题目。
+思路就是使用 bfs 来遍历所有的路径，然后判断是否有路径的和等于 sum，我们来使用上面的模板来解决这道题目。
 
 ```python
 class Solution:
@@ -204,7 +211,7 @@ class Solution:
         return res
 ```
 
-也可以不去遍历整个queue，单独处理cur:
+也可以不去遍历整个 queue，单独处理 cur:
 
 ```python
 class Solution:
@@ -219,7 +226,7 @@ class Solution:
             cur, path = q.popleft()
             if not cur.left and not cur.right:
                 res.append(path)
-            
+
             elif not cur.left and cur.right:
                 q.append((cur.right, path + str(cur.right.val)))
 
@@ -240,7 +247,7 @@ class Solution:
 
 #### [102. Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
 
-这道题目是二叉树的bfs的模板题，我们可以直接使用上面的模板来解决这道题目。
+这道题目是二叉树的 bfs 的模板题，我们可以直接使用上面的模板来解决这道题目。
 
 ```python
 class Solution:
@@ -464,7 +471,7 @@ class Solution:
 - 时间复杂度：O(N)，其中 N 是树的节点数。对每个节点访问一次。
 - 空间复杂度：O(N)，其中 N 是树的节点数。空间复杂度主要取决于队列的开销，队列中的元素个数不会超过树的节点数。
 
-### 矩阵的BFS
+### 矩阵的 BFS
 
 #### [200. Number of Islands](https://leetcode.com/problems/number-of-islands/)
 
@@ -577,22 +584,22 @@ class Solution:
     def updateMatrix(self, mat: List[List[int]]) -> List[List[int]]:
         q = deque()
         visited = set()
-        
+
         for i in range(len(mat)):
             for j in range(len(mat[0])):
                 if mat[i][j] == 0:
                     q.append((i, j)) # 把所有的海洋都当做是起始点
                     visited.add((i, j))
-        
+
         while q:
             i, j = q.popleft()
-            
+
             for x, y in (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1):
                 if 0 <= x < len(mat) and 0 <= y < len(mat[0]) and (x, y) not in visited:
                     mat[x][y] = mat[i][j] + 1
                     visited.add((x, y))
                     q.append((x, y))
-                    
+
         return mat
 ```
 
@@ -622,7 +629,7 @@ class Solution:
         visited = set()
         fresh = 0
         time = 0
-        
+
         for i in range(len(grid)):
             for j in range(len(grid[0])):
                 if grid[i][j] == 2:
@@ -630,10 +637,10 @@ class Solution:
                     visited.add((i, j))
                 elif grid[i][j] == 1:
                     fresh += 1
-        
+
         if fresh == 0:
             return 0
-        
+
         while q:
             for _ in range(len(q)):
                 i, j = q.popleft()
@@ -644,7 +651,7 @@ class Solution:
                         visited.add((x, y))
                         q.append((x, y))
             time += 1
-                    
+
         return time - 1 if fresh == 0 else -1
 ```
 
@@ -672,27 +679,27 @@ class Solution:
         q = deque()
         visited = set()
         n = len(grid)
-        
+
         if grid[0][0] == 1 or grid[n - 1][n - 1] == 1:
             return -1
-        
+
         q.append((0, 0))
         visited.add((0, 0))
         time = 0
-        
+
         while q:
             for _ in range(len(q)):
                 i, j = q.popleft()
-                
+
                 if i == n - 1 and j == n - 1:
                     return time + 1
-                
+
                 for x, y in (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1), (i + 1, j + 1), (i - 1, j - 1), (i + 1, j - 1), (i - 1, j + 1):
                     if 0 <= x < n and 0 <= y < n and (x, y) not in visited and grid[x][y] == 0:
                         visited.add((x, y))
                         q.append((x, y))
             time += 1
-                    
+
         return -1
 ```
 
@@ -720,28 +727,28 @@ class Solution:
         q = deque()
         visited = set()
         n = len(grid)
-        
+
         for i in range(n):
             for j in range(n):
                 if grid[i][j] == 1:
                     q.append((i, j))
                     visited.add((i, j))
-        
+
         if len(q) == 0 or len(q) == n * n:
             return -1
-        
+
         time = 0
-        
+
         while q:
             for _ in range(len(q)):
                 i, j = q.popleft()
-                
+
                 for x, y in (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1):
                     if 0 <= x < n and 0 <= y < n and (x, y) not in visited and grid[x][y] == 0:
                         visited.add((x, y))
                         q.append((x, y))
             time += 1
-                    
+
         return time - 1
 ```
 
@@ -774,10 +781,10 @@ class Solution:
         visited = set()
         visited.add((sr, sc))
         image[sr][sc] = color
-        
+
         while q:
             x, y = q.popleft()
-            
+
             for i, j in (x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1):
                 if 0 <= i < len(image) and 0 <= j < len(image[0]) and image[i][j] == old_color and (i, j) not in visited:
                     image[i][j] = color
@@ -819,7 +826,7 @@ class Solution:
         q.append(start)
         visited[start[0]][start[1]] = 1
 
-        while q: 
+        while q:
             cur = q.popleft()
             if cur[0] == destination[0] and cur[1] == destination[1]:
                 return True
@@ -872,18 +879,18 @@ class Solution:
 
         rows = len(maze)
         cols = len(maze[0])
-        
+
         dir = [1, 0, -1, 0, 1]
         res = [[float('inf') for _ in range(cols)] for _ in range(rows)]
         q = deque()
         q.append([start[0], start[1], 0])
 
-        while q: 
+        while q:
             cur = q.popleft()
             if cur[2] >= res[cur[0]][cur[1]]:
                 continue
             res[cur[0]][cur[1]] = cur[2]
-            
+
             for i in range(4):
                 newX = cur[0]
                 newY = cur[1]
@@ -898,5 +905,5 @@ class Solution:
 
                 q.append([newX, newY, path])
 
-        return -1 if res[destination[0]][destination[1]] == float('inf') 
+        return -1 if res[destination[0]][destination[1]] == float('inf')
 ```
