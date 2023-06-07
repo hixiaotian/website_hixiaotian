@@ -8,9 +8,13 @@
 
 接下来有一些题型去探讨了各种双指针的使用方法，让我们先看看！
 
-<b>↓点击题目就可以直接跳转到leetcode题目页面↓</b>
+### 基础题
+
+<b>↓ 点击题目就可以直接跳转到 leetcode 题目页面 ↓</b>
 
 #### [125. Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)
+
+这道题的描述就是判断一个字符串是否是回文串.
 
 test cases:
 
@@ -20,7 +24,7 @@ Output: true
 Explanation: "amanaplanacanalpanama" is a palindrome.
 ```
 
-这道题的描述就是判断一个字符串是否是回文串，我们可以用双指针来做，一个指针从左向右，一个指针从右向左，然后判断两个指针指向的字符是否相等，如果不相等，那么就不是回文串，如果相等，那么就继续向中间移动。
+我们可以用双指针来做，一个指针从左向右，一个指针从右向左，然后判断两个指针指向的字符是否相等，如果不相等，那么就不是回文串，如果相等，那么就继续向中间移动。
 
 ```python
 class Solution:
@@ -45,6 +49,8 @@ class Solution:
 
 #### [680. Valid Palindrome II](https://leetcode.com/problems/valid-palindrome-ii/)
 
+这道题是上一道题的变种，这道题的描述是，给定一个字符串，我们可以删除一个字符，判断是否能构成回文串。
+
 test cases:
 
 ```text
@@ -59,24 +65,22 @@ Input: s = "abc"
 Output: false
 ```
 
-这道题是上一道题的变种，这道题的描述是，给定一个字符串，我们可以删除一个字符，判断是否能构成回文串。
-
-我们可以用双指针来做，一个指针从左向右，一个指针从右向左，然后判断两个指针指向的字符是否相等，如果不相等，那么就删除左指针指向的字符，或者删除右指针指向的字符，然后判断剩下的字符串是否是回文串，如果是，那么就返回true，否则就返回false。
+我们可以用双指针来做，一个指针从左向右，一个指针从右向左，然后判断两个指针指向的字符是否相等，如果不相等，那么就删除左指针指向的字符，或者删除右指针指向的字符，然后判断剩下的字符串是否是回文串，如果是，那么就返回 true，否则就返回 false。
 
 ```python
 class Solution:
     def validPalindrome(self, s: str) -> bool:
         start, end = 0, len(s) - 1
-        
+
         while start < end:
             if s[start] != s[end]:
-                left = s[start: end]
-                right = s[start + 1: end + 1]
+                left = s[start: end] # 删除左指针指向的字符
+                right = s[start + 1: end + 1] # 删除右指针指向的字符
                 return left == left[::-1] or right == right[::-1]
-            
+
             start += 1
             end -= 1
-            
+
         return True
 ```
 
@@ -86,6 +90,8 @@ class Solution:
 - 空间复杂度：O(1)，因为只用了常数个变量
 
 #### [392. Is Subsequence](https://leetcode.com/problems/is-subsequence/)
+
+这道题的描述是，给定两个字符串 s 和 t，判断 s 是否是 t 的子序列。
 
 test cases:
 
@@ -97,9 +103,7 @@ Input: s = "axc", t = "ahbgdc"
 Output: false
 ```
 
-这道题的描述是，给定两个字符串s和t，判断s是否是t的子序列。
-
-我们可以用同向双指针来做，一个指针指向s，一个指针指向t，然后判断两个指针指向的字符是否相等，如果相等，那么就继续向后移动，如果不相等，那么就继续向后移动t指针，直到t指针指向的字符和s指针指向的字符相等，然后再继续向后移动。
+我们可以用同向双指针来做，一个指针指向 s，一个指针指向 t，然后判断两个指针指向的字符是否相等，如果相等，那么就继续向后移动，如果不相等，那么就继续向后移动 t 指针，直到 t 指针指向的字符和 s 指针指向的字符相等，然后再继续向后移动。
 
 ```python
 class Solution:
@@ -119,6 +123,8 @@ class Solution:
 
 #### [167. Two Sum II - Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
 
+这道题的描述是，给定一个升序数组和一个目标值，找到数组中两个数的和等于目标值，返回这两个数的下标。
+
 test cases:
 
 ```text
@@ -134,8 +140,6 @@ Input: numbers = [-1,0], target = -1
 Output: [1,2]
 Explanation: The sum of -1 and 0 is -1. Therefore index1 = 1, index2 = 2. We return [1, 2].
 ```
-
-这道题的描述是，给定一个升序数组和一个目标值，找到数组中两个数的和等于目标值，返回这两个数的下标。
 
 我们可以用异向双指针来做，一个指针指向数组的最左边，一个指针指向数组的最右边，然后判断两个指针指向的数的和是否等于目标值，如果等于，那么就返回两个指针的下标，如果小于目标值，那么就向右移动左指针，如果大于目标值，那么就向左移动右指针。
 
@@ -160,6 +164,8 @@ class Solution:
 
 #### [11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/)
 
+这道题的描述是，给定一个数组，数组中的每个元素代表一个柱子的高度，然后找到两个柱子，使得这两个柱子和 x 轴围成的面积最大。
+
 test cases:
 ![image.png](https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/17/question_11.jpg)
 
@@ -168,8 +174,6 @@ Input: height = [1,8,6,2,5,4,8,3,7]
 Output: 49
 Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
 ```
-
-这道题的描述是，给定一个数组，数组中的每个元素代表一个柱子的高度，然后找到两个柱子，使得这两个柱子和x轴围成的面积最大。
 
 我们可以用异向双指针来做，一个指针指向数组的最左边，一个指针指向数组的最右边，然后计算两个指针指向的柱子围成的面积，然后判断两个指针指向的柱子的高度，如果左指针指向的柱子的高度小于右指针指向的柱子的高度，那么就向右移动左指针，如果左指针指向的柱子的高度大于右指针指向的柱子的高度，那么就向左移动右指针。
 
@@ -194,6 +198,8 @@ class Solution:
 
 #### [15. 3Sum](https://leetcode.com/problems/3sum/)
 
+这道题的描述是，给定一个数组，找到数组中所有三个数的和等于 0 的三元组，返回这些三元组。
+
 test cases:
 
 ```text
@@ -206,8 +212,6 @@ Output: []
 Input: nums = [0]
 Output: []
 ```
-
-这道题的描述是，给定一个数组，找到数组中所有三个数的和等于0的三元组，返回这些三元组。
 
 我们可以用异向双指针来做，一个指针指向数组的最左边，一个指针指向数组的最右边，然后判断两个指针指向的数的和是否等于目标值，如果等于，那么就返回两个指针的下标，如果小于目标值，那么就向右移动左指针，如果大于目标值，那么就向左移动右指针。
 
@@ -236,7 +240,7 @@ class Solution:
             j += 1
 ```
 
-我们也可以使用隔板法来做，gap当作隔板，左边的指针指向隔板左边，右边的指针指向隔板右边，然后判断左指针指向的数加上隔板指向的数加上右指针指向的数是否等于0，如果等于0，那么就返回三个指针的下标，如果小于0，那么就向右移动左指针，如果大于0，那么就向左移动右指针。
+我们也可以使用隔板法来做，gap 当作隔板，左边的指针指向隔板左边，右边的指针指向隔板右边，然后判断左指针指向的数加上隔板指向的数加上右指针指向的数是否等于 0，如果等于 0，那么就返回三个指针的下标，如果小于 0，那么就向右移动左指针，如果大于 0，那么就向左移动右指针。
 
 ```python
 class Solution:

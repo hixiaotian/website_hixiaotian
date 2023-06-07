@@ -1,12 +1,12 @@
 ### 前言
 
-在这个专题，我们将主要讨论stack的具体用法。
+在这个专题，我们将主要讨论 stack 的具体用法。
 
-有很多类型题会使用到stack，比如说括号匹配，计算器等等。
+有很多类型题会使用到 stack，比如说括号匹配，计算器等等。
 
-### 什么是stack
+### 什么是 stack
 
-stack是一种数据结构，它的特点是先进后出，后进先出。
+stack 是一种数据结构，它的特点是先进后出，后进先出。
 
 为什么适用于括号匹配呢？因为括号匹配的时候，我们需要先匹配到的括号后匹配到，这样才能保证括号的匹配是正确的。
 
@@ -30,7 +30,7 @@ Output: false
 
 ```
 
-这道题的描述就是括号匹配，我们可以使用stack来解决。
+这道题的描述就是括号匹配，我们可以使用 stack 来解决。
 
 ```python
 class Solution:
@@ -54,7 +54,7 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储括号。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储括号。
 
 #### [150. Evaluate Reverse Polish Notation](https://leetcode.com/problems/evaluate-reverse-polish-notation/)
 
@@ -78,7 +78,7 @@ Explanation: ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
 = 22
 ```
 
-这道题的描述逆向波兰表达式，那么为什么可以使用stack呢？仔细思考一下，我们可以发现，逆向波兰表达式的计算顺序是先计算后面的，然后再计算前面的，这样才能保证计算的正确性。
+这道题的描述逆向波兰表达式，那么为什么可以使用 stack 呢？仔细思考一下，我们可以发现，逆向波兰表达式的计算顺序是先计算后面的，然后再计算前面的，这样才能保证计算的正确性。
 
 ```python
 class Solution:
@@ -103,10 +103,10 @@ class Solution:
 
 复杂度分析：
 
-- 时间复杂度：O(n)，原因是我们需要遍历整个tokens。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储数字。
+- 时间复杂度：O(n)，原因是我们需要遍历整个 tokens。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
 
-### [155. Min Stack](https://leetcode.com/problems/min-stack/)
+#### [155. Min Stack](https://leetcode.com/problems/min-stack/)
 
 test cases:
 
@@ -129,7 +129,7 @@ minStack.top();    // return 0
 minStack.getMin(); // return -2
 ```
 
-这道题的描述是最小栈，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证最小值的正确性。
+这道题的描述是最小栈，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证最小值的正确性。
 
 ```python
 class MinStack:
@@ -141,7 +141,7 @@ class MinStack:
         if not self.stack:
             self.stack.append((val, val))
             return
-        
+
         current_min = self.stack[-1][1]
         self.stack.append((val, min(val, current_min)))
 
@@ -149,7 +149,7 @@ class MinStack:
         self.stack.pop()
 
     def top(self) -> int:
-        return self.stack[-1][0]        
+        return self.stack[-1][0]
 
     def getMin(self) -> int:
         return self.stack[-1][1]
@@ -158,7 +158,7 @@ class MinStack:
 复杂度分析：
 
 - 时间复杂度：O(1)，原因是我们只需要操作栈顶。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储数字。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
 
 #### [71. Simplify Path](https://leetcode.com/problems/simplify-path/)
 
@@ -178,7 +178,7 @@ Input: path = "/a/./b/../../c/"
 Output: "/c"
 ```
 
-这道题的描述是简化路径，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证路径的正确性。
+这道题的描述是简化路径，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证路径的正确性。
 
 ```python
 class Solution:
@@ -196,8 +196,8 @@ class Solution:
 
 复杂度分析：
 
-- 时间复杂度：O(n)，原因是我们需要遍历整个path。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储路径。
+- 时间复杂度：O(n)，原因是我们需要遍历整个 path。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储路径。
 
 #### [394. Decode String](https://leetcode.com/problems/decode-string/)
 
@@ -217,7 +217,7 @@ Input: s = "abc3[cd]xyz"
 Output: "abccdcdcdxyz"
 ```
 
-这道题的描述是解码字符串，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证字符串的正确性。
+这道题的描述是解码字符串，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证字符串的正确性。
 
 ```python
 class Solution:
@@ -241,7 +241,50 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储字符串。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储字符串。
+
+### Calculator
+
+#### 模版
+
+实际上，针对所有的计算器问题（包含括号，加减乘除），我们都可以使用这个模版来解决。
+
+```python
+class Solution:
+    def calculate(self, s):
+        def update(op, v):
+            if op == "+": stack.append(v)
+            if op == "-": stack.append(-v)
+            if op == "*": stack.append(stack.pop() * v)           #for BC II and BC III
+            if op == "/": stack.append(int(stack.pop() / v))      #for BC II and BC III
+
+        it, num, stack, sign = 0, 0, [], "+"
+
+        while it < len(s):
+            if s[it].isdigit():
+                num = num * 10 + int(s[it])
+            elif s[it] in "+-*/":
+                update(sign, num)
+                num, sign = 0, s[it]
+            elif s[it] == "(":                                        # For BC I and BC III
+                num, j = self.calculate(s[it + 1:])
+                it = it + j
+            elif s[it] == ")":                                        # For BC I and BC III
+                update(sign, num)
+                return sum(stack), it + 1
+            it += 1
+        update(sign, num)
+        return sum(stack)
+```
+
+上面能够解决所有的计算器问题的原因是，就是使用几个步骤：
+
+1. 遇到数字，就把数字加入到数字中。
+2. 遇到符号，就把数字加入到 stack 中。
+3. 遇到左括号，就把数字加入到 stack 中。
+4. 遇到右括号，就把数字加入到 stack 中。
+
+不过如果你想要解决的是基本计算器，你也可以使用不 recursive 的方法来解决。
 
 #### [224. Basic Calculator](https://leetcode.com/problems/basic-calculator/)
 
@@ -258,7 +301,7 @@ Input: s = "(1+(4+5+2)-3)+(6+8)"
 Output: 23
 ```
 
-这道题的描述是基本计算器，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
+这道题的描述是基本计算器，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
 
 ```python
 class Solution:
@@ -294,7 +337,7 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储数字。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
 
 #### [227. Basic Calculator II](https://leetcode.com/problems/basic-calculator-ii/)
 
@@ -311,7 +354,7 @@ Input: s = " 3+5 / 2 "
 Output: 5
 ```
 
-这道题的描述是基本计算器II，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
+这道题的描述是基本计算器 II，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
 
 ```python
 class Solution:
@@ -339,7 +382,7 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储数字。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
 
 #### [772. Basic Calculator III](https://leetcode.com/problems/basic-calculator-iii/)
 
@@ -359,7 +402,7 @@ Input: s = "(2+6* 3+5- (3*14/7+2)*5)+3"
 Output: -12
 ```
 
-这道题的描述是基本计算器III，我们可以使用stack来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
+这道题的描述是基本计算器 III，我们可以使用 stack 来解决的原因是，我们需要先进后出，这样才能保证计算的正确性。
 
 ```python
 class Solution:
@@ -398,5 +441,4 @@ class Solution:
 复杂度分析：
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
-- 空间复杂度：O(n)，原因是我们需要使用stack来存储数字。
-
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
