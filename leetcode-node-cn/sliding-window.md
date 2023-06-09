@@ -36,6 +36,8 @@ def slidingWindow(s: str):
 - 1. 先不断地增加 right 指针扩大窗口
 - 2. 当窗口包含了 t 的所有字符后，开始不断地收缩 left 指针，直到得到最小窗口
 
+### 基础题
+
 #### [3. Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
 
 这道题的描述是找到最长的不重复子串，我们可以使用 sliding window 来解决。
@@ -67,11 +69,9 @@ class Solution:
             window[cur_right] += 1
             right += 1
 
-            while window[cur_right] > 1:
+            while window[cur_right] > 1: # 如果 window 中 cur_right 字符的数量大于 1，说明窗口中出现了重复的字符
                 cur_left = s[left]
                 window[cur_left] -= 1
-                if window[cur_left] == 0:
-                    del window[cur_left]
                 left += 1
 
             res = max(res, right - left)
@@ -124,10 +124,10 @@ class Solution:
                     min_length = right - left
 
                 cur_left = s[left]
-                window[cur_left] -= 1
                 if cur_left in target: # 如果 window 中 cur_left 字符的数量不再符合要求了，那么 valid -= 1
-                    if window[cur_left] < target[cur_left]:
+                    if window[cur_left] == target[cur_left]:
                         valid -= 1
+                window[cur_left] -= 1
                 left += 1
 
         return s[min_start: min_start + min_length] if min_length != float("inf") else ""
@@ -162,7 +162,7 @@ class Solution:
     def minSubArrayLen(self, s: int, nums: List[int]) -> int:
         left, right = 0, 0
         res = float("inf")
-        window = 0
+        window = 0 # 记录 window 中的和
 
         while right < len(nums):
             cur_right = nums[right]
@@ -210,23 +210,22 @@ class Solution:
         while right < len(s2):
             cur_right = s2[right]
             window[cur_right] += 1
-
-            if window[cur_right] == target[cur_right]:
-                valid += 1 # 如果 window 中 cur_right 字符的数量符合要求了，那么 valid += 1
-
             right += 1
 
-            while left <= right and valid >= len(target): # 如果 window 中包含了所有字符，那么就开始收缩 left 指针
-                if right - left == len(s1): # 如果当前的窗口大小等于 s1 的长度，则说明找到了一个排列
+            if cur_right in target:
+                if window[cur_right] == target[cur_right]:
+                    valid += 1 # 如果 window 中 cur_right 字符的数量符合要求了，那么 valid += 1
+
+            while right - left >= len(s1): # 如果 window 中包含了所有字符，那么就开始收缩 left 指针
+                if valid == len(target): # 如果当前的窗口大小等于 s1 的长度，则说明找到了一个排列
                     return True
 
                 cur_left = s2[left]
-                window[cur_left] -= 1
                 if cur_left in target: # 如果 window 中 cur_left 字符的数量不再符合要求了，那么 valid -= 1
-                    if window[cur_left] < target[cur_left]:
+                    if window[cur_left] == target[cur_left]:
                         valid -= 1
+                window[cur_left] -= 1
                 left += 1
-
         return False
 ```
 
@@ -264,20 +263,24 @@ class Solution:
             cur_right = s[right]
             window[cur_right] += 1
 
-            if window[cur_right] == target[cur_right]:
-                valid += 1 # 如果 window 中 cur_right 字符的数量符合要求了，那么 valid += 1
+            if cur_right in target:
+                if window[cur_right] == target[cur_right]:
+                    valid += 1
 
             right += 1
 
-            while left <= right and valid >= len(target): # 如果 window 中包含了所有字符，那么就开始收缩 left 指针
-                if right - left == len(p): # 如果当前的窗口大小等于 p 的长度，则说明找到了一个排列
+            while right - left >= len(p): # 如果 window 中包含了所有字符，那么就开始收缩 left 指针
+                if valid == len(target): # 如果当前的窗口大小等于 p 的长度，则说明找到了一个排列
                     res.append(left)
 
                 cur_left = s[left]
-                window[cur_left] -= 1
+
                 if cur_left in target: # 如果 window 中 cur_left 字符的数量不再符合要求了，那么 valid -= 1
-                    if window[cur_left] < target[cur_left]:
+                    if window[cur_left] == target[cur_left]:
                         valid -= 1
+
+                window[cur_left] -= 1
+
                 left += 1
 
         return res
@@ -288,49 +291,7 @@ class Solution:
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
 - 空间复杂度：O(n)，因为我们使用了一个 window 来存储当前的子串。
 
-#### [2444. Count Subarrays With Fixed Bounds] (https://leetcode.com/problems/count-subarrays-with-fixed-ends/)
-
-这道题的描述是找到所有的子数组，这些子数组的最大值和最小值都在给定的范围内。
-
-test cases:
-
-```text
-Input: nums = [2, 1, 4, 3], left = 2, right = 3
-Output: 3
-
-Input: nums = [2, 9, 2, 5, 6], left = 2, right = 8
-Output: 7
-```
-
-这道题的思路是，我们使用一个 window 来存储当前的子串，然后不断地增加 right 指针来扩大窗口，直到窗口中包含了所有符合要求的子数组，此时我们就需要收缩 left 指针来缩小窗口，直到窗口中不再包含所有符合要求的子数组。
-
-```python
-class Solution:
-    def numSubarrayBoundedMax(self, nums: List[int], left: int, right: int) -> int:
-        left, right = 0, 0
-        window = []
-        res = 0
-
-        while right < len(nums):
-            cur_right = nums[right]
-            if left <= cur_right <= right:
-                window.append(cur_right)
-
-            right += 1
-
-            while left <= right and (not window or max(window) > right or min(window) < left):
-                if window:
-                    res += len(window)
-                window.pop(0)
-                left += 1
-
-        return res
-```
-
-复杂度分析：
-
-- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
-- 空间复杂度：O(n)，因为我们使用了一个 window 来存储当前的子串。
+### 高级题
 
 #### [30. Substring with Concatenation of All Words](https://leetcode.com/problems/substring-with-concatenation-of-all-words/)
 
@@ -351,36 +312,38 @@ Output: []
 ```python
 class Solution:
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
-        left, right = 0, 0
-        window = collections.Counter()
+        word_len = len(words[0])
+        all_word_len = word_len * len(words)
         target = collections.Counter(words)
-        valid = 0 # 记录 window 中已经有多少字符符合要求了
         res = []
 
-        while right < len(s):
-            cur_right = s[right]
-            window[cur_right] += 1
+        for i in range(word_len):
+            word_dict = collections.defaultdict(int)
+            left = right = i
 
-            if window[cur_right] == target[cur_right]:
-                valid += 1 # 如果 window 中 cur_right 字符的数量符合要求了，那么 valid += 1
+            while right < len(s):
+                word = s[right:right + word_len]
+                word_dict[word] += 1
 
-            right += 1
+                if right - left + word_len == all_word_len:
+                    if word_dict == target:
+                        res.append(left)
 
-            while left <= right and valid >= len(target): # 如果 window 中包含了所有字符，那么就开始收缩 left 指针
-                if right - left == len(words) * len(words[0]): # 如果当前的窗口大小等于 words 的长度，则说明找到了一个排列
-                    res.append(left)
+                    word = s[left:left + word_len]
+                    word_dict[word] -= 1
+                    if word_dict[word] == 0:
+                        del word_dict[word]
 
-                cur_left = s[left]
-                window[cur_left] -= 1
-                if cur_left in target: # 如果 window 中 cur_left 字符的数量不再符合要求了，那么 valid -= 1
-                    if window[cur_left] < target[cur_left]:
-                        valid -= 1
-                left += 1
-
+                    left += word_len
+                right += word_len
         return res
 ```
 
 复杂度分析：
 
-- 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
+- 时间复杂度：O(nm)，原因是我们需要遍历整个字符串, n 是 s 的长度，m 是 words 的长度。
 - 空间复杂度：O(n)，因为我们使用了一个 window 来存储当前的子串。
+
+#### [2444. Count Subarrays With Fixed Bounds] (https://leetcode.com/problems/count-subarrays-with-fixed-bounds/)
+
+未完待续
