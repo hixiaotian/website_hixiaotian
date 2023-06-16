@@ -1055,3 +1055,136 @@ Output: [110, 1, 111]
 ```python
 未完待续
 ```
+
+#### [126. Word Ladder II](https://leetcode.com/problems/word-ladder-ii/)
+
+test cases:
+
+```text
+Input:
+beginWord = "hit",
+endWord = "cog",
+wordList = ["hot","dot","dog","lot","log","cog"]
+
+Output:
+[
+  ["hit","hot","dot","dog","cog"],
+  ["hit","hot","lot","log","cog"]
+]
+
+Input:
+beginWord = "hit"
+endWord = "cog"
+wordList = ["hot","dot","dog","lot","log"]
+
+Output: []
+```
+
+这道题的描述是给定两个单词（beginWord 和 endWord）和一个字典 wordList，找到从 beginWord 到 endWord 的所有最短转换序列。转换需遵循如下规则：
+
+- 每次转换只能改变一个字母。
+- 转换过程中的中间单词必须是字典中的单词。
+
+我们当然可以使用 bfs 来做，每一个东西都存储在 queue 当中，但是这样会 mle：
+
+```python
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList):
+
+        if not endWord or not beginWord or not wordList or endWord not in wordList or beginWord == endWord:
+            return []
+
+        graph = collections.defaultdict(list)
+        for word in wordList:
+            for i in range(len(beginWord)):
+                graph[word[:i] + "*" + word[i+1:]].append(word)
+        print(graph)
+
+        ans = []
+        q = collections.deque([(beginWord, [beginWord])])
+        visited = set()
+        visited.add(beginWord)
+
+        while q and not ans:
+            length = len(q)
+            localvisited = set()
+            for _ in range(length):
+                word, path = q.popleft()
+                for i in range(len(beginWord)):
+                    candidate = word[:i] + "*" + word[i+1:]
+                    for nxt in graph[candidate]:
+                        if nxt == endWord:
+                            ans.append(path + [endWord])
+                        if nxt not in visited:
+                            localvisited.add(nxt)
+                            q.append((nxt, path + [nxt]))
+
+            visited = visited.union(localvisited)
+        return ans
+
+```
+
+这道题的更好的思路也是回溯算法的思路，我们可以把每一个单词都看成是一个树，比如 beginWord = "hit"，endWord = "cog"，wordList = ["hot","dot","dog","lot","log","cog"] 的时候，我们可以看成是这样的一棵树：
+
+```text
+                hit
+        /       |       \
+       hot      dot      lot
+      /  \     /  \     /  \
+    dot   lot dot  lot dot  lot
+   / \   / \ / \  / \ / \  / \
+  dog cog dog cog dog cog dog cog
+```
+
+那么我们就可以先用 BFS 构建这个 graph，然后对这个 graph 进行回溯，得到所有的结果。
+
+```python
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList):
+        wordList.append(beginWord) # needs to add begin word into list for indexing (L126 already consider endword to be in the wordList)
+        indexes = self.build_indexes(wordList)
+        distance = self.bfs(endWord, indexes)
+        results = []
+        self.dfs(beginWord, endWord, distance, indexes, [beginWord], results)
+        return results
+    def build_indexes(self, wordList):
+        indexes = {}
+        for word in wordList:
+            for i in range(len(word)):
+                key = word[:i] + '%' + word[i + 1:]
+                if key in indexes:
+                    indexes[key].add(word)
+                else:
+                    indexes[key] = set([word])
+        return indexes
+    def bfs(self, end, indexes): # bfs from end to start
+        distance = {end: 0}
+        queue = deque([end])
+        while queue:
+            word = queue.popleft()
+            for next_word in self.get_next_words(word, indexes):
+                if next_word not in distance:
+                    distance[next_word] = distance[word] + 1
+                    queue.append(next_word)
+        return distance
+    def get_next_words(self, word, indexes):
+        words = set()
+        for i in range(len(word)):
+            key = word[:i] + '%' + word[i + 1:]
+            for w in indexes.get(key, []):
+                words.add(w)
+        return words
+
+    def dfs(self, curt, target, distance, indexes, path, results):
+        if curt == target:
+            results.append(list(path))
+            return
+        for word in self.get_next_words(curt, indexes):
+            if word not in distance: # if there is no a possible way in word ladder
+                return
+            if distance[word] != distance[curt] - 1:
+                continue
+            path.append(word)
+            self.dfs(word, target, distance, indexes, path, results)
+            path.pop()
+```

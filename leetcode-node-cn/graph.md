@@ -218,6 +218,61 @@ class Solution:
 - 时间复杂度：O(MN)，其中 M 和 N 分别为行数和列数。
 - 空间复杂度：O(MN)，在最坏情况下，整个网格均为陆地，深度优先搜索的深度达到 MN。
 
+#### [1926. nearest exit from entrance in maze](https://leetcode.com/problems/nearest-exit-from-entrance-in-maze/)
+
+这个题目的描述就是，给定一个二维的矩阵，里面有 `.` 和 `+`，我们需要找到从入口到出口的最短路径。
+
+test cases:
+
+![nearest_exit_from_entrance_in_maze](https://assets.leetcode.com/uploads/2021/06/04/nearest1-grid.jpg)
+
+```text
+Input: maze = [["+","+",".","+"],[".",".",".","+"],["+","+","+","."]], entrance = [1,2]
+Output: 1
+Explanation: There are 3 exits in this maze at [1,0], [0,2], and [2,3].
+Initially, you are at the entrance cell [1,2].
+- You can reach [1,0] by moving 2 steps left.
+- You can reach [0,2] by moving 1 step up.
+It is impossible to reach [2,3] from the entrance.
+Thus, the nearest exit is [0,2], which is 1 step away.
+```
+
+这道题的思路是，我们需要先找到所有的出口，然后再从入口开始做 BFS，直到找到出口。
+
+```python
+class Solution:
+    def nearestExit(self, maze: List[List[str]], entrance: List[int]) -> int:
+        q = collections.deque([(entrance[0], entrance[1], 0)])
+
+        visited = set()
+        visited.add(tuple(entrance))
+
+        min_step = float("inf")
+
+        def is_border(i, j):
+            if entrance != [i, j]:
+                return i in [0, len(maze) - 1] or j in [0, len(maze[0]) - 1]
+            return False
+
+        while q:
+            i, j, step = q.popleft()
+            if is_border(i, j):
+                min_step = min(min_step, step)
+                break
+
+            for x, y in (i + 1, j), (i - 1, j), (i, j - 1), (i, j + 1):
+                if 0 <= x < len(maze) and 0 <= y < len(maze[0]) and (x, y) not in visited and maze[x][y] == ".":
+                    q.append((x, y, step + 1))
+                    visited.add((x, y))
+
+        return min_step if min_step != float("inf") else -1
+```
+
+复杂度分析：
+
+- 时间复杂度：O(MN)，其中 M 和 N 分别为行数和列数。
+- 空间复杂度：O(MN)，在最坏情况下，整个网格均为陆地，深度优先搜索的深度达到 MN。
+
 #### [133. clone graph](https://leetcode.com/problems/clone-graph/)
 
 这个题目的描述就是，给定一个无向图，我们需要克隆这个图。
@@ -650,6 +705,44 @@ Output: 0
 
 这道题的思路是，我们需要用 BFS 来遍历整个图，然后用一个 visited 数组来记录已经访问过的单词。
 
+我们可以试着把每一个词的相邻词都输出出来，但是这样做，会导致 tle：
+
+```python
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        if endWord not in wordList or not endWord or not beginWord or not wordList:
+            return 0
+        wordList.append(beginWord)
+        wordList.append(endWord)
+        wordList = set(wordList)
+        graph = collections.defaultdict(set)
+        for word in wordList: # 这样存储的话，会导致tle，因为我们嵌套了两个for loop
+            for word2 in wordList:
+                if word != word2:
+                    diff = 0
+                    for i in range(len(beginWord)):
+                        if word[i] != word2[i]:
+                            diff += 1
+                    if diff == 1:
+                        graph[word].add(word2)
+                        graph[word2].add(word)
+        visited = set()
+        visited.add(beginWord)
+        q = collections.deque([(beginWord, 1)])
+        while q:
+            current_word, level = q.popleft()
+            for i in range(len(beginWord)):
+                for word in graph[current_word]:
+                    if word == endWord:
+                        return level + 1
+                    if word not in visited:
+                        visited.add(word)
+                        q.append((word, level + 1))
+        return 0
+```
+
+不过我们可以优化一下，用\*来代替每一个字母，这样就可以把每一个词的相邻词在一个 for 循环做到，就不会 tle 了：
+
 ```python
 class Solution:
     def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
@@ -660,7 +753,7 @@ class Solution:
 
         for word in wordList:
             for i in range(len(beginWord)):
-                all_combo_dict[word[:i] + "*" + word[i + 1:]].append(word)
+                all_combo_dict[word[:i] + "*" + word[i + 1:]].append(word) # 这里存储的是每一个词的每一个index的相邻词
 
         visited = set()
         visited.add(beginWord)
@@ -842,3 +935,166 @@ class Solution:
 
 - 时间复杂度：O(N + M)，其中 N 是课程的数量，M 是先修课程的数量。在建图的过程中，我们需要 O(M) 的时间来找到每个节点的入度和出度。
 - 空间复杂度：O(N + M)，其中 N 是课程的数量，M 是先修课程的数量。我们需要 O(M) 的空间来存储图。
+
+### 二分图
+
+#### [785. is graph bipartite](https://leetcode.com/problems/is-graph-bipartite/)
+
+这个题目的描述是，给定一个图，我们需要判断这个图是不是二分图。
+
+test cases:
+
+```text
+Input: [[1,3], [0,2], [1,3], [0,2]]
+Output: true
+
+Input: [[1,2,3], [0,2], [0,1,3], [0,2]]
+Output: false
+```
+
+这道题的思路是，我们可以用两种颜色来标记每个节点，然后用 BFS 来遍历每个节点，如果遍历到的节点的颜色和当前节点的颜色相同，那么就不是二分图。
+
+BFS:
+
+```python
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        n = len(graph)
+        color = [False] * n
+        visited = set()
+
+        def bfs(vertex):
+            q = collections.deque([vertex])
+            visited.add(vertex)
+
+            while q:
+                cur = q.popleft()
+                for nxt in graph[cur]:
+                    if nxt not in visited:
+                        color[nxt] = not color[cur]
+                        visited.add(nxt)
+                        q.append(nxt)
+                    else:
+                        if color[nxt] == color[cur]:
+                            return False
+            return True
+
+        for vertex in range(n):
+            if bfs(vertex) == False:
+                return False
+
+        return True
+```
+
+DFS:
+
+```python
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        n = len(graph)
+        color = [False] * n
+        visited = [False] * n
+
+        def dfs(vertex):
+            visited[vertex] = True
+            for nxt in graph[vertex]:
+                if visited[nxt] == False:
+                    visited[nxt] = True
+                    color[nxt] = not color[vertex]
+                    if dfs(nxt) == False:
+                        return False
+                else:
+                    if color[nxt] == color[vertex]:
+                        return False
+            return True
+
+        for vertex in range(n):
+            if visited[vertex] == False:
+                if dfs(vertex) == False:
+                    return False
+
+        return True
+```
+
+复杂度分析：
+
+- 时间复杂度：O(N + M)，其中 N 是图中的节点数，M 是图中的边数。在遍历图的过程中，我们需要对每个节点进行染色，并对每条边进行染色，时间复杂度均为 O(1)。
+- 空间复杂度：O(N)，其中 N 是图中的节点数。我们需要使用 O(N) 的空间记录每个节点的颜色，以及使用 O(N) 的空间记录每个节点的访问情况。
+
+#### [886. possible bipartition](https://leetcode.com/problems/possible-bipartition/)
+
+这个题目的描述是，给定一个图，我们需要判断这个图能不能被分成两个部分，使得每个部分里面的节点都没有边相连。
+
+test cases:
+
+```text
+Input: N = 4, dislikes = [[1,2],[1,3],[2,4]]
+Output: true
+
+Input: N = 3, dislikes = [[1,2],[1,3],[2,3]]
+Output: false
+```
+
+这道题的思路是，我们可以用两种颜色来标记每个节点，然后用 BFS 来遍历每个节点，如果遍历到的节点的颜色和当前节点的颜色相同，那么就不是二分图。
+
+BFS:
+
+```python
+class Solution:
+    def possibleBipartition(self, N: int, dislikes: List[List[int]]) -> bool:
+        graph = collections.defaultdict(list)
+        for u, v in dislikes:
+            graph[u].append(v)
+            graph[v].append(u)
+
+        color = [0] * (N + 1)
+        for i in range(1, N + 1):
+            if color[i] == 0:
+                q = collections.deque([i])
+                color[i] = 1
+                while q:
+                    cur = q.popleft()
+                    for nxt in graph[cur]:
+                        if color[nxt] == 0:
+                            color[nxt] = -color[cur]
+                            q.append(nxt)
+                        else:
+                            if color[nxt] == color[cur]:
+                                return False
+        return True
+```
+
+DFS:
+
+```python
+class Solution:
+    def possibleBipartition(self, N: int, dislikes: List[List[int]]) -> bool:
+        graph = collections.defaultdict(list)
+        for u, v in dislikes:
+            graph[u].append(v)
+            graph[v].append(u)
+
+        color = [0] * (N + 1)
+        for i in range(1, N + 1):
+            if color[i] == 0:
+                color[i] = 1
+                if self.dfs(i, color, graph) == False:
+                    return False
+        return True
+
+    def dfs(self, vertex, color, graph):
+        for nxt in graph[vertex]:
+            if color[nxt] == 0:
+                color[nxt] = -color[vertex]
+                if self.dfs(nxt, color, graph) == False:
+                    return False
+            else:
+                if color[nxt] == color[vertex]:
+                    return False
+        return True
+```
+
+复杂度分析：
+
+- 时间复杂度：O(N + M)，其中 N 是图中的节点数，M 是图中的边数。在遍历图的过程中，我们需要对每个节点进行染色，并对每条边进行染色，时间复杂度均为 O(1)。
+- 空间复杂度：O(N)，其中 N 是图中的节点数。我们需要使用 O(N) 的空间记录每个节点的颜色，以及使用 O(N) 的空间记录每个节点的访问情况。
