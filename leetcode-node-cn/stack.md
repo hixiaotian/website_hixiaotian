@@ -442,3 +442,173 @@ class Solution:
 
 - 时间复杂度：O(n)，原因是我们需要遍历整个字符串。
 - 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+### 单调栈
+
+#### [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
+
+这道题的描述是每日温度，去查找下一个比当前温度高的温度的距离。
+
+test case:
+
+```text
+Input: temperatures = [73,74,75,71,69,72,76,73]
+Output: [1,1,4,2,1,1,0,0]
+```
+
+```python
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        stack = []
+        res = [0] * len(temperatures)
+        for i in range(len(temperatures)):
+            while stack and temperatures[i] > temperatures[stack[-1]]:
+                res[stack[-1]] = i - stack[-1]
+                stack.pop()
+            stack.append(i)
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+#### [503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)
+
+这道题的描述是下一个更大的元素 II，去查找下一个比当前元素大的元素。
+
+test case:
+
+```text
+Input: nums = [1,2,1]
+Output: [2,-1,2]
+```
+
+```python
+class Solution:
+    def nextGreaterElements(self, nums: List[int]) -> List[int]:
+        stack = []
+        res = [-1] * len(nums)
+        for i in range(len(nums)):
+            while stack and nums[i] > nums[stack[-1]]:
+                res[stack[-1]] = nums[i]
+                stack.pop()
+            stack.append(i)
+        for i in range(len(nums)):
+            while stack and nums[i] > nums[stack[-1]]:
+                res[stack[-1]] = nums[i]
+                stack.pop()
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+#### [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+
+这道题的描述是柱状图中最大的矩形，去查找柱状图中最大的矩形。
+
+test case:
+
+```text
+Input: heights = [2,1,5,6,2,3]
+Output: 10
+```
+
+```python
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        stack = []
+        res = 0
+        heights.append(0)
+        for i in range(len(heights)):
+            while stack and heights[i] < heights[stack[-1]]:
+                h = heights[stack.pop()]
+                w = i if not stack else i - stack[-1] - 1
+                res = max(res, h * w)
+            stack.append(i)
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+#### [85. Maximal Rectangle](https://leetcode.com/problems/maximal-rectangle/)
+
+这道题的描述是最大矩形，去查找最大矩形。
+
+test case:
+
+```text
+Input: matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+Output: 6
+```
+
+```python
+class Solution:
+    def maximalRectangle(self, matrix: List[List[str]]) -> int:
+        if not matrix:
+            return 0
+        res = 0
+        heights = [0] * len(matrix[0])
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                heights[j] = heights[j] + 1 if matrix[i][j] == "1" else 0
+            res = max(res, self.largestRectangleArea(heights))
+        return res
+
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        stack = []
+        res = 0
+        heights.append(0)
+        for i in range(len(heights)):
+            while stack and heights[i] < heights[stack[-1]]:
+                h = heights[stack.pop()]
+                w = i if not stack else i - stack[-1] - 1
+                res = max(res, h * w)
+            stack.append(i)
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(nm)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+#### [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+
+这道题的描述是接雨水，去计算接雨水的量。
+
+test case:
+
+```text
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+```
+
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        stack = []
+        res = 0
+        for i in range(len(height)):
+            while stack and height[i] > height[stack[-1]]:
+                bottom = height[stack.pop()]
+                if not stack:
+                    break
+                h = min(height[i], height[stack[-1]]) - bottom
+                w = i - stack[-1] - 1
+                res += h * w
+            stack.append(i)
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
