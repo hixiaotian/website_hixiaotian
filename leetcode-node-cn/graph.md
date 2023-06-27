@@ -218,6 +218,217 @@ class Solution:
 - 时间复杂度：O(MN)，其中 M 和 N 分别为行数和列数。
 - 空间复杂度：O(MN)，在最坏情况下，整个网格均为陆地，深度优先搜索的深度达到 MN。
 
+#### [417. pacific atlantic water flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+
+这个题目的描述就是，给定一个二维的矩阵，给出能同时流向太平洋和大西洋的坐标。
+
+test cases:
+
+```text
+Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+Explanation: The following cells can flow to the Pacific and Atlantic oceans, as shown below:
+[0,4]: [0,4] -> Pacific Ocean
+       [0,4] -> Atlantic Ocean
+[1,3]: [1,3] -> [0,3] -> Pacific Ocean
+       [1,3] -> [1,4] -> Atlantic Ocean
+[1,4]: [1,4] -> [1,3] -> [0,3] -> Pacific Ocean
+       [1,4] -> Atlantic Ocean
+[2,2]: [2,2] -> [1,2] -> [0,2] -> Pacific Ocean
+       [2,2] -> [2,3] -> [2,4] -> Atlantic Ocean
+[3,0]: [3,0] -> Pacific Ocean
+       [3,0] -> [4,0] -> Atlantic Ocean
+[3,1]: [3,1] -> [3,0] -> Pacific Ocean
+       [3,1] -> [4,1] -> Atlantic Ocean
+[4,0]: [4,0] -> Pacific Ocean
+       [4,0] -> Atlantic Ocean
+Note that there are other possible paths for these cells to flow to the Pacific and Atlantic oceans.
+```
+
+这道题的思路是，从边界开始，分别找到能流向太平洋和大西洋的坐标，然后求交集。
+
+BFS:
+
+```python
+class Solution:
+    def bfs(self, ocean, heights):
+        q = collections.deque(ocean)
+        while q:
+            i, j = q.popleft()
+            for x, y in (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1):
+                if 0 <= x < len(heights) and 0 <= y < len(heights[0]) and (x, y) not in ocean and heights[x][y] >= heights[i][j]:
+                    q.append((x, y))
+                    ocean.add((x, y))
+        return ocean
+
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        if not heights: return []
+
+        w, h = len(heights[0]), len(heights)
+        pacific = set([(i, 0) for i in range(h)] + [(0, j) for j in range(w)])
+        atlantic = set([(i, w - 1) for i in range(h)] + [(h - 1, j) for j in range(w)])
+
+        return list(self.bfs(pacific, heights) & self.bfs(atlantic, heights))
+```
+
+#### [323. number of connected components in an undirected graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
+
+这个题目的描述就是，给定一个无向图，求出有多少个连通的部分。
+
+test cases:
+
+```text
+Input: n = 5, edges = [[0,1],[1,2],[3,4]]
+Output: 2
+```
+
+这道题的思路是，使用 DFS 或者 BFS 遍历图，然后记录遍历过的节点，最后返回遍历过的次数。
+
+BFS:
+
+```python
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        graph = collections.defaultdict(list)
+        for edge in edges:
+            graph[edge[0]].append(edge[1])
+            graph[edge[1]].append(edge[0])
+
+        visited = set()
+
+        def bfs(i):
+            q = collections.deque([i])
+            while q:
+                cur = q.popleft()
+                for nxt in graph[cur]:
+                    if nxt not in visited:
+                        visited.add(nxt)
+                        q.append(nxt)
+
+        res = 0
+        for i in range(n):
+            if i not in visited:
+                bfs(i)
+                res += 1
+        return res
+```
+
+DFS:
+
+```python
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        graph = collections.defaultdict(list)
+        for edge in edges:
+            graph[edge[0]].append(edge[1])
+            graph[edge[1]].append(edge[0])
+
+        visited = set()
+
+        def dfs(i):
+            for nxt in graph[i]:
+                if nxt not in visited:
+                    visited.add(nxt)
+                    dfs(nxt)
+
+        res = 0
+        for i in range(n):
+            if i not in visited:
+                dfs(i)
+                res += 1
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：$O(n + e)$
+- 空间复杂度：$O(n + e)$
+
+#### [261. graph valid tree](https://leetcode.com/problems/graph-valid-tree/)
+
+这个题目的描述就是，给定一个无向图，判断是否是一棵树。
+
+test cases:
+
+```text
+Input: n = 5, and edges = [[0,1], [0,2], [0,3], [1,4]]
+Output: true
+```
+
+这道题的思路是，使用 DFS 或者 BFS 遍历图，然后判断是否有环。
+
+BFS:
+
+```python
+class Solution(object):
+    def validTree(self, n, edges):
+        """
+        :type n: int
+        :type edges: List[List[int]]
+        :rtype: bool
+        """
+
+        if len(edges) != n - 1:
+            return False
+
+        graph = [set() for _ in range(n)]
+        for edge in edges:
+            graph[edge[0]].add(edge[1])
+            graph[edge[1]].add(edge[0])
+
+        visited = set()
+        parent = {}
+
+        q = collections.deque([0])
+        while q:
+            cur = q.popleft()
+            visited.add(cur)
+            for nxt in graph[cur]:
+                if nxt not in visited:
+                    parent[nxt] = cur # 这里记录的是父节点
+                    q.append(nxt)
+                elif nxt != parent[cur]: # 如果当前节点已经访问过了，但是不是父节点，说明有环
+                    print(parent)
+                    return False
+
+        print(parent)
+        return len(visited) == n
+```
+
+同时这题可以尝试用 Topological Sort 来做，但是这里需要注意的是，我们需要判断是否有环，如果有环的话，就不是一棵树了。
+
+```python
+class Solution(object):
+    def validTree(self, n, edges):
+        """
+        :type n: int
+        :type edges: List[List[int]]
+        :rtype: bool
+        """
+
+        if len(edges) != n - 1:
+            return False
+
+        graph = [set() for _ in range(n)]
+        for edge in edges:
+            graph[edge[0]].add(edge[1])
+            graph[edge[1]].add(edge[0])
+
+        indegrees = [0] * n
+        for i in range(n):
+            indegrees[i] = len(graph[i])
+
+        queue = deque([i for i, degrees in enumerate(indegrees) if degrees == 1])
+        while queue:
+            node = queue.popleft()
+            for child in graph[node]:
+                indegrees[child] -= 1
+                if indegrees[child] == 1:
+                    queue.append(child)
+
+        return all(degree == 0 for degree in indegrees)
+```
+
 #### [1926. nearest exit from entrance in maze](https://leetcode.com/problems/nearest-exit-from-entrance-in-maze/)
 
 这个题目的描述就是，给定一个二维的矩阵，里面有 `.` 和 `+`，我们需要找到从入口到出口的最短路径。

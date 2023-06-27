@@ -445,6 +445,72 @@ class Solution:
 
 ### 单调栈
 
+#### [1475. Final Prices With a Special Discount in a Shop](https://leetcode.com/problems/final-prices-with-a-special-discount-in-a-shop/)
+
+这道题的描述是给定一个数组，我们需要找到数组中比当前元素小的第一个元素，然后将当前元素减去这个元素，如果没有比当前元素小的元素，那么就不减。
+
+test case:
+
+```text
+Input: prices = [8,4,6,2,3]
+Output: [4,2,4,2,3]
+Explanation:
+For item 0 with price[0]=8 you will receive a discount equivalent to prices[1]=4, therefore, the final price you will pay is 8 - 4 = 4.
+For item 1 with price[1]=4 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 4 - 2 = 2.
+For item 2 with price[2]=6 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 6 - 2 = 4.
+For items 3 and 4 you will not receive any discount at all.
+```
+
+很显然，想要实现 O（n）的时间复杂度，我们需要使用单调栈。注意，栈里存储的是 index，而不是 value。
+
+我们用前面的例子来理解一下单调递增栈：
+
+```text
+prices = [8,4,6,2,3]
+stack = []
+index = 0, value = 8
+
+stack = [0]
+index = 1, value = 4
+
+这时候发现栈顶元素比当前元素大，（8 > 4) 那么我们就将栈顶元素弹出，直到栈顶元素比当前元素小，或者栈为空，再将当前元素压入栈中。
+把弹出的元素减去当前元素，这样完成了第一个更新。
+prices[0] -= prices[1] = 4
+
+stack = [1]
+index = 2, value = 6
+
+stack = [1, 2]
+index = 3, value = 2
+
+这时候发现栈顶元素比当前元素大，（4，6 > 2） 那么我们就将栈顶元素弹出，直到栈顶元素比当前元素小，或者栈为空，再将当前元素压入栈中。
+把弹出的元素减去当前元素，这样完成了第二个更新。
+prices[2] -= prices[3] = 4
+prices[1] -= prices[3] = 2
+
+...
+```
+
+这样我们就能找到比当前元素小的第一个元素，然后将当前元素减去这个元素。
+
+```python
+class Solution:
+    def finalPrices(self, prices: List[int]) -> List[int]:
+        stack = []
+        for index, value in enumerate(prices):
+            # 如果当前元素比栈顶元素小，那么就将栈顶元素减去当前元素
+            while stack and prices[stack[-1]] >= value:
+                prices[stack.pop()] -= value
+            stack.append(index)
+
+        return prices
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
 #### [739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
 
 这道题的描述是每日温度，去查找下一个比当前温度高的温度的距离。
@@ -456,16 +522,116 @@ Input: temperatures = [73,74,75,71,69,72,76,73]
 Output: [1,1,4,2,1,1,0,0]
 ```
 
+我们用前面的例子来理解一下单调递减栈（这里用单调递减是因为我们需要找到下一个比当前温度高的温度）：
+
+```text
+temperatures = [73,74,75,71,69,72,76,73]
+stack = []
+
+index = 0, value = 73
+stack = [0]
+
+index = 1, value = 74
+当我们发现栈顶元素比当前元素小的时候 (73 < 74)，我们就将栈顶元素弹出，直到栈顶元素比当前元素大，或者栈为空，再将当前元素压入栈中。
+同时，我们记录下当前元素的 index 与栈顶元素的 index 的差值，这样就能得到下一个比当前温度高的温度的距离。
+更新后：
+result[0] = 1 - 0 = 1
+stack = [1]
+
+index = 2, value = 75
+当我们发现栈顶元素比当前元素小的时候 (74 < 75)，我们就将栈顶元素弹出，直到栈顶元素比当前元素大，或者栈为空，再将当前元素压入栈中。
+同时，我们记录下当前元素的 index 与栈顶元素的 index 的差值，这样就能得到下一个比当前温度高的温度的距离。
+更新后：
+result[1] = 2 - 1 = 1
+stack = [2]
+
+index = 3, value = 71
+当我们发现栈顶元素比当前元素小的时候 (75 > 71)，我们就将当前元素压入栈中。
+stack = [2, 3]
+
+index = 4, value = 69
+当我们发现栈顶元素比当前元素小的时候 (71 > 69)，我们就将当前元素压入栈中。
+stack = [2, 3, 4]
+
+index = 5, value = 72
+当我们发现栈顶元素比当前元素小的时候 (69 < 72)，我们就将栈顶元素弹出，直到栈顶元素比当前元素大，或者栈为空，再将当前元素压入栈中。
+同时，我们记录下当前元素的 index 与栈顶元素的 index 的差值，这样就能得到下一个比当前温度高的温度的距离。
+更新后：
+result[4] = 5 - 4 = 1
+result[3] = 5 - 3 = 2
+stack = [2, 5]
+
+index = 6, value = 76
+当我们发现栈顶元素比当前元素小的时候 (72 < 76)，我们就将栈顶元素弹出，直到栈顶元素比当前元素大，或者栈为空，再将当前元素压入栈中。
+同时，我们记录下当前元素的 index 与栈顶元素的 index 的差值，这样就能得到下一个比当前温度高的温度的距离。
+更新后：
+result[5] = 6 - 5 = 1
+result[2] = 6 - 2 = 4
+stack = [6]
+
+index = 7, value = 73
+当我们发现栈顶元素比当前元素小的时候 (76 > 73)，我们就将当前元素压入栈中。
+stack = [6, 7]
+```
+
 ```python
 class Solution:
     def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        n = len(temperatures)
+        answer = [0] * n
         stack = []
-        res = [0] * len(temperatures)
-        for i in range(len(temperatures)):
-            while stack and temperatures[i] > temperatures[stack[-1]]:
-                res[stack[-1]] = i - stack[-1]
-                stack.pop()
-            stack.append(i)
+
+        for curr_day, curr_temp in enumerate(temperatures):
+            # Pop until the current day's temperature is not
+            # warmer than the temperature at the top of the stack
+            while stack and temperatures[stack[-1]] < curr_temp:
+                prev_day = stack.pop()
+                answer[prev_day] = curr_day - prev_day
+            stack.append(curr_day)
+
+        return answer
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
+#### [901. Online Stock Span](https://leetcode.com/problems/online-stock-span/)
+
+这道题的描述是股票价格跨度，我们需要计算出每一天的股票价格跨度。
+
+test case:
+
+```text
+Input
+["StockSpanner", "next", "next", "next", "next", "next", "next", "next"]
+[[], [100], [80], [60], [70], [60], [75], [85]]
+Output
+[null, 1, 1, 1, 2, 1, 4, 6]
+
+Explanation
+StockSpanner stockSpanner = new StockSpanner();
+stockSpanner.next(100); // return 1
+stockSpanner.next(80);  // return 1
+stockSpanner.next(60);  // return 1
+stockSpanner.next(70);  // return 2
+stockSpanner.next(60);  // return 1
+stockSpanner.next(75);  // return 4, because the last 4 prices (including today's price of 75) were less than or equal to today's price.
+stockSpanner.next(85);  // return 6
+```
+
+```python
+class StockSpanner:
+
+    def __init__(self):
+        self.stack = []
+
+    def next(self, price: int) -> int:
+        res = 1
+        while self.stack and self.stack[-1][0] <= price:
+            res += self.stack.pop()[1]
+        self.stack.append((price, res))
         return res
 ```
 
@@ -507,6 +673,82 @@ class Solution:
 - 时间复杂度：O(n)，原因是我们需要遍历整个数组。
 - 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
 
+#### [32. Longest Valid Parentheses](https://leetcode.com/problems/longest-valid-parentheses/)
+
+这道题的描述是最长有效括号，去查找最长有效括号。
+
+test case:
+
+```text
+Input: s = "(()"
+Output: 2
+
+Input: s = ")()())"
+Output: 4
+```
+
+我们用栈来解决这个问题，我们首先将 -1 放入栈中。然后，对于遇到的每个 '(' ，我们将它的下标放入栈中。对于遇到的每个 ')' ，我们弹出栈顶的元素并将当前元素的下标与弹出元素下标作差，得出当前有效括号字符串的长度。通过这种方法，我们继续计算有效子字符串的长度，并最终返回最长有效子字符串的长度。
+
+我们看一个例子：
+
+```text
+s = ")()())"
+
+stack = [-1]
+
+index = 0, value = )
+第一个字符是')'，我们将其下标放入栈中。
+因为栈为空，我们将')'下标放入栈中。
+stack = [0]
+
+index = 1, value = (
+第二个字符是'('，我们将其下标放入栈中。
+stack = [0, 1]
+
+index = 2, value = )
+第三个字符是')'，我们弹出栈顶元素并将当前元素的下标与弹出元素下标作差，得出当前有效括号字符串的长度。
+stack = [0]
+res = max(res, i - stack[-1]) = max(0, 2 - 0) = 2
+
+index = 3, value = (
+第四个字符是'('，我们将其下标放入栈中。
+stack = [0, 3]
+
+index = 4, value = )
+第五个字符是')'，我们弹出栈顶元素并将当前元素的下标与弹出元素下标作差，得出当前有效括号字符串的长度。
+stack = [0]
+res = max(res, i - stack[-1]) = max(1, 4 - 0) = 4
+
+index = 5, value = )
+第六个字符是')'，我们弹出栈顶元素并将当前元素的下标与弹出元素下标作差，得出当前有效括号字符串的长度。
+stack = []
+因为栈为空，我们将当前元素的下标放入栈中。
+stack = [5]
+
+```
+
+```python
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        stack = [-1] # 这里是-1，因为如果第一个字符是')'，那么就会出现stack为空的情况，导致后面的计算出错
+        res = 0
+        for i in range(len(s)):
+            if s[i] == '(':
+                stack.append(i)
+            else:
+                stack.pop()
+                if not stack:
+                    stack.append(i)
+                else:
+                    res = max(res, i - stack[-1])
+        return res
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，原因是我们需要遍历整个数组。
+- 空间复杂度：O(n)，原因是我们需要使用 stack 来存储数字。
+
 #### [84. Largest Rectangle in Histogram](https://leetcode.com/problems/largest-rectangle-in-histogram/)
 
 这道题的描述是柱状图中最大的矩形，去查找柱状图中最大的矩形。
@@ -518,12 +760,56 @@ Input: heights = [2,1,5,6,2,3]
 Output: 10
 ```
 
+我们用前面的例子来理解一下单调递增栈（这里用单调递增是因为我们需要找到下一个比当前柱子矮的柱子）：
+
+```text
+
+index = 0, value = 2
+stack = [0]
+
+index = 1, value = 1
+当我们发现栈顶元素比当前元素大的时候 (2 > 1)，我们就将栈顶元素弹出，直到栈顶元素比当前元素小，或者栈为空，再将当前元素压入栈中。
+同时我们要更新最大面积，最大面积 = 当前柱子高度 * (当前柱子的 index - 栈顶元素的 index)，这里的 index 是指柱子在数组中的下标。
+更新后：
+result = 2 * 1 = 2 （栈为空，说明前面的柱子都比当前柱子矮，所以最大面积就是当前柱子的高度 * 当前柱子的 index）
+stack = [1]
+
+index = 2, value = 5
+当我们发现栈顶元素比当前元素小的时候 (1 < 5)，我们就将当前元素压入栈中。
+stack = [1, 2]
+
+index = 3, value = 6
+当我们发现栈顶元素比当前元素小的时候 (5 < 6)，我们就将当前元素压入栈中。
+stack = [1, 2, 3]
+
+index = 4, value = 2
+当我们发现栈顶元素比当前元素大的时候 (6 > 2)，我们就将栈顶元素弹出，直到栈顶元素比当前元素小，或者栈为空，再将当前元素压入栈中。
+同时我们要更新最大面积，最大面积 = 当前柱子高度 * (当前柱子的 index - 栈顶元素的 index - 1)，这里的 index 是指柱子在数组中的下标。
+更新后：
+result = 6 * (4 - 2 - 1）= 6 （此时栈里是 [1, 2]，所以最大面积就是当前柱子的高度 * (4 - 2 - 1)）
+result = 5 * (4 - 1 - 1）= 10 （此时栈里是 [1]，所以最大面积就是当前柱子的高度 * (4 - 1 - 1)）
+stack = [1, 4]
+
+index = 5, value = 3
+当我们发现栈顶元素比当前元素小的时候 (2 < 3)，我们就将当前元素压入栈中。
+stack = [1, 4, 5]
+
+index = 6, value = 0
+当我们发现栈顶元素比当前元素大的时候 (3 > 0)，我们就将栈顶元素弹出，直到栈顶元素比当前元素小，或者栈为空，再将当前元素压入栈中。
+同时我们要更新最大面积，最大面积 = 当前柱子高度 * (当前柱子的 index - 栈顶元素的 index - 1)，这里的 index 是指柱子在数组中的下标。
+更新后：
+result = 3 * (6 - 4 - 1）= 3 （此时栈里是 [1, 4]，所以最大面积就是当前柱子的高度 * (6 - 4 - 1)）
+result = 2 * (6 - 1 - 1）= 8 （此时栈里是 [1]，所以最大面积就是当前柱子的高度 * (6 - 1 - 1)）
+result = 1 * (6 - 0 - 1）= 6 （此时栈里是 []，所以最大面积就是当前柱子的高度 * (6)）
+stack = [6]
+```
+
 ```python
 class Solution:
     def largestRectangleArea(self, heights: List[int]) -> int:
         stack = []
         res = 0
-        heights.append(0)
+        heights.append(0) # 这里是为了让最后一个柱子也能被处理
         for i in range(len(heights)):
             while stack and heights[i] < heights[stack[-1]]:
                 h = heights[stack.pop()]
