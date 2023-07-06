@@ -52,6 +52,52 @@ class Trie:
         return True
 ```
 
+#### [14. Longest Common Prefix](https://leetcode.com/problems/longest-common-prefix/)
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def add_word(self, word):
+        cur = self.root
+        for c in word:
+            if c not in cur.children:
+                cur.children[c] = TrieNode()
+            cur = cur.children[c]
+        cur.end = True
+
+    def longest_prefix(self):
+        res = []
+        cur = self.root
+        while cur:
+            # return when reaches the end of word or when there are more than 1 branches
+            if cur.end or len(cur.children) > 1:
+                return ''.join(res)
+            c = list(cur.children)[0]
+            res.append(c)
+            cur = cur.children[c]
+        return ''.join(res)
+
+class Solution:
+    def longestCommonPrefix(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: str
+        """
+        if not strs:
+            return ''
+        T = Trie()
+        for s in strs:
+            T.add_word(s)
+        return T.longest_prefix()
+```
+
 ### 进阶题目
 
 #### [211. Add and Search Word - Data structure design](https://leetcode.com/problems/add-and-search-word-data-structure-design/)
@@ -72,18 +118,18 @@ class WordDictionary:
         for letter in word:
             cur = cur.children[letter]
         cur.is_word = True
-        
+
     def search(self, word: str) -> bool:
         if not word:
             return False
-        
+
         cur = self.root
         return self.dfs(word, cur, 0)
 
     def dfs(self, word, cur, i) -> bool:
         if not cur:
             return False
-        
+
         if i == len(word):
             return cur.is_word
 
@@ -121,16 +167,16 @@ class Trie:
                 return False
         return cur.is_word
 
-class Solution:     
+class Solution:
     def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
         if not board:
             return board
-        
+
         def dfs(i, j, cur, part):
             if cur.is_word:
                 ans.add(part)
                 cur.is_word = False
-            
+
             letter, board[i][j] =  board[i][j], "#"
             for x, y in (i + 1, j), (i - 1, j), (i, j - 1), (i, j + 1):
                 if 0 <= x < len(board) and 0 <= y < len(board[0]) and board[x][y] in cur.children:
@@ -161,7 +207,7 @@ class Solution:
         L = len(bin(max(nums))) - 2
         # zero left-padding to ensure L bits for each number
         nums = [[(x >> i) & 1 for i in range(L)][::-1] for x in nums]
-        
+
         max_xor = 0
         trie = {}
         for num in nums:
@@ -173,8 +219,8 @@ class Solution:
                 if not bit in node:
                     node[bit] = {}
                 node = node[bit]
-                
-                # to compute max xor of that new number 
+
+                # to compute max xor of that new number
                 # with all previously inserted
                 toggled_bit = 1 - bit
                 if toggled_bit in xor_node:
@@ -183,7 +229,7 @@ class Solution:
                 else:
                     curr_xor = curr_xor << 1
                     xor_node = xor_node[bit]
-                    
+
             max_xor = max(max_xor, curr_xor)
 
         return max_xor

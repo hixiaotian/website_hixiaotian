@@ -269,3 +269,148 @@ class Solution:
 
 - 时间复杂度：O(n^2)，因为每个字符都会被遍历一次
 - 空间复杂度：O(1)，因为只用了常数个变量
+
+### inplace 替换题
+
+#### [283. Move Zeroes](https://leetcode.com/problems/move-zeroes/)
+
+这道题的描述是，给定一个数组，将数组中的 0 移动到数组的末尾，同时保持非 0 元素的相对顺序。
+
+test cases:
+
+```text
+Input: [0,1,0,3,12]
+Output: [1,3,12,0,0]
+```
+
+这道题的思路是，使用两个指针 fast 和 slow， fast 指针用来遍历数组，slow 指针用来指向非 0 元素的位置，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针指向的元素为 0，然后 fast 指针向前移动一步，slow 指针不动，直到 fast 指针指向的元素不为 0，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针到达数组的末尾，然后将 slow 指针指向的元素到数组的末尾都赋值为 0。
+
+```python
+class Solution:
+    def moveZeroes(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        slow, fast = 0, 0
+        while fast < len(nums):
+            while fast + 1 < len(nums) and nums[fast] == 0:
+                fast += 1
+            nums[slow] = nums[fast]
+
+            slow += 1
+            fast += 1
+
+
+        while slow < len(nums):
+            if nums[slow] != 0:
+                nums[slow] = 0
+            slow += 1
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个字符都会被遍历一次
+- 空间复杂度：O(1)，因为只用了常数个变量
+
+#### [27. Remove Element](https://leetcode.com/problems/remove-element/)
+
+这道题的描述是，给定一个数组和一个值，将数组中所有等于这个值的元素删除，并返回删除后数组的长度。
+
+test cases:
+
+```text
+Input: nums = [3,2,2,3], val = 3
+Output: 2, nums = [2,2]
+```
+
+这道题的思路是，使用两个指针 fast 和 slow， fast 指针用来遍历数组，slow 指针用来指向非 val 元素的位置，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针指向的元素为 val，然后 fast 指针向前移动一步，slow 指针不动，直到 fast 指针指向的元素不为 val，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针到达数组的末尾，然后返回 slow 指针的值。
+
+```python
+class Solution:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        slow, fast = 0, 0
+        while fast < len(nums):
+            while fast + 1 < len(nums) and nums[fast] == val:
+                fast += 1
+            nums[slow] = nums[fast]
+
+            slow += 1
+            fast += 1
+
+        # 如果最后一个元素是 val，那么 slow 指针指向的元素就是 val，所以需要减 1
+        if len(nums) >= 1 and nums[-1] == val:
+            return slow - 1
+
+        return slow
+```
+
+复杂度分析:
+
+- 时间复杂度：O(n)，因为每个字符都会被遍历一次
+- 空间复杂度：O(1)，因为只用了常数个变量
+
+#### [26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/)
+
+这道题的描述是，给定一个排序数组，删除重复的元素，使得每个元素只出现一次，并返回删除后数组的长度。
+
+test cases:
+
+```text
+Input: nums = [1,1,2]
+Output: 2, nums = [1,2]
+```
+
+这道题的思路是，使用两个指针 fast 和 slow， fast 指针用来遍历数组，slow 指针用来指向非重复元素的位置，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针指向的元素和 slow 指针指向的元素不相等，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针到达数组的末尾，然后返回 slow 指针的值。
+
+```python
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        slow, fast = 0, 0
+        while fast < len(nums):
+            while fast + 1 < len(nums) and nums[fast] == nums[fast + 1]:
+                fast += 1
+            nums[slow] = nums[fast]
+
+            slow += 1
+            fast += 1
+
+        return slow
+```
+
+复杂度分析：
+
+- 时间复杂度：O(n)，因为每个字符都会被遍历一次
+- 空间复杂度：O(1)，因为只用了常数个变量
+
+#### [80. Remove Duplicates from Sorted Array II](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/)
+
+这道题的描述是，给定一个排序数组，删除重复的元素，使得每个元素最多只出现两次，并返回删除后数组的长度。
+
+test cases:
+
+```text
+Input: nums = [1,1,1,2,2,3]
+Output: 5, nums = [1,1,2,2,3]
+```
+
+这道题和前面的区别是，前面的题目是每个元素只出现一次，而这道题是每个元素最多只出现两次，所以需要增加一个变量 count，用来记录当前元素出现的次数，当 count 大于等于 2 的时候，就不再将 fast 指针指向的元素赋值给 slow 指针指向的元素，而是只移动 fast 指针，直到 fast 指针指向的元素和 slow 指针指向的元素不相等，然后将 fast 指针指向的元素赋值给 slow 指针指向的元素，然后 fast 指针向前移动一步，slow 指针向前移动一步，直到 fast 指针到达数组的末尾，然后返回 slow 指针的值。
+
+```python
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        slow, fast = 0, 0
+        count = 0
+        while fast < len(nums):
+            while fast + 1 < len(nums) and nums[fast] == nums[fast + 1]:
+                fast += 1
+                count += 1
+                if count < 2:
+                    nums[slow] = nums[fast]
+                    slow += 1
+            nums[slow] = nums[fast]
+            slow += 1
+            fast += 1
+            count = 0
+
+        return slow
+```
