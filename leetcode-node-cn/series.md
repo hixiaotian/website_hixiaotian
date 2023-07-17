@@ -86,18 +86,34 @@ Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
 ```python
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        buy1, sell1, buy2, sell2 = float('-inf'), 0, float('-inf'), 0
 
-        for i in range(len(prices)):
-            buy1 = max(buy1, -prices[i])
-            sell1 = max(sell1, buy1 + prices[i])
-            buy2 = max(buy2, sell1 - prices[i])
-            sell2 = max(sell2, buy2 + prices[i])
+        def get_profit(start, end):
+            if start > end:
+                return 0
 
-        return sell2
+            temp_min = prices[start]
+            max_profit = 0
+            for i in range(start, end + 1):
+                temp_min = min(temp_min, prices[i])
+                max_profit = max(max_profit, prices[i] - temp_min)
+
+            return max_profit
+
+
+
+        if not prices or len(prices) == 1:
+            return 0
+
+        max_profit = 0
+        for i in range(len(prices) + 1):
+            left_max = get_profit(0, i - 1)
+            right_max = get_profit(i, len(prices) - 1)
+            max_profit = max(max_profit, left_max + right_max)
+
+        return max_profit
 ```
 
-一个解释更清楚的方法：
+这个方法是 O(N^2)的时间复杂度，会超时。下面是一个解释更清楚的方法：
 
 ```python
 class Solution:
@@ -763,7 +779,7 @@ Input: [[1,2],[3,4],[5,6],[7,8]]
 Output: 4
 ```
 
-这道题的解法是：先将区间列表按照左端点排序，然后使用一个变量记录当前箭的位置，遍历区间列表，如果当前区间的左端点大于等于箭的位置，则需要增加箭的数量，否则更新箭的位置为当前区间的左端点和箭的位置中的较大值，然后继续遍历区间列表。最后返回箭的数量。
+这道题的解法是：先将区间列表按照右端点排序，然后遍历区间列表，如果当前区间的左端点大于上一个区间的右端点，则需要增加一支箭。
 
 ```python
 class Solution:
@@ -771,19 +787,17 @@ class Solution:
         if not points:
             return 0
 
-        points.sort()
+        points.sort(key = lambda x: x[1])
 
-        arrow = points[0][1]
-        res = 1
+        arrows = 1
+        first_end = points[0][1]
 
-        for i in range(1, len(points)):
-            if points[i][0] > arrow:
-                res += 1
-                arrow = points[i][1]
-            else:
-                arrow = max(arrow, points[i][1])
+        for x_start, x_end in points:
+            if first_end < x_start:
+                arrows += 1
+                first_end = x_end
 
-        return res
+        return arrows
 ```
 
 复杂度分析：
